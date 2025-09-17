@@ -1,0 +1,228 @@
+'use client';
+
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
+
+// Import images - you'll need to add these to your public folder or assets
+import depresiImg from '../../../../public/mood/Depresi.png';
+import kecanduanImg from '../../../../public/mood/Kecanduan.png';
+import moodswingImg from '../../../../public/mood/MoodSwing.png';
+import stressImg from '../../../../public/mood/Stress.png';
+import traumaImg from '../../../../public/mood/Trauma.png';
+
+interface Condition {
+  id: number;
+  name: string;
+  image: string; // Using string for now, can be changed to StaticImageData when images are properly set up
+  description: string;
+  symptoms: string[];
+}
+
+const conditions: Condition[] = [
+  {
+    id: 1,
+    name: 'Depresi',
+    image: depresiImg.src,
+    description: 'Depresi adalah kondisi mental yang serius namun dapat diobati. Jika kamu merasa kehilangan minat, kesulitan tidur, atau memiliki pikiran negatif selama lebih dari 2 minggu, jangan ragu untuk mencari bantuan. Kamu tidak sendirian dalam menghadapi ini. 💙',
+    symptoms: ['Perasaan sedih berkepanjangan', 'Kehilangan minat', 'Gangguan tidur', 'Pikiran negatif', 'Kelelahan mental']
+  },
+  {
+    id: 2,
+    name: 'Stress',
+    image: stressImg.src,
+    description: 'Stress adalah respons alami tubuh terhadap tekanan, namun jika berlebihan dapat mempengaruhi kesehatan mental dan fisik. Kenali tanda-tandanya dan kelola stress dengan tepat untuk hidup yang lebih seimbang. ',
+    symptoms: ['Mudah cemas', 'Sulit berkonsentrasi', 'Ketegangan otot', 'Perubahan nafsu makan', 'Gangguan tidur']
+  },
+  {
+    id: 3,
+    name: 'Moodswing',
+    image: moodswingImg.src,
+    description: 'Moodswing atau perubahan suasana hati yang drastis bisa mempengaruhi kehidupan sehari-hari. Penting untuk mengenali pola perubahan mood dan mencari cara sehat untuk mengelolanya. 🎭',
+    symptoms: ['Perubahan emosi tiba-tiba', 'Sensitifitas tinggi', 'Energi naik-turun', 'Perubahan perilaku', 'Kesulitan mengontrol emosi']
+  },
+  {
+    id: 4,
+    name: 'Trauma',
+    image: traumaImg.src,
+    description: 'Trauma adalah bekas luka emosional yang dapat mempengaruhi kesehatan mental jangka panjang. Dengan dukungan yang tepat dan penanganan profesional, pemulihan dari trauma adalah sesuatu yang mungkin. 🌅',
+    symptoms: ['Flashback kejadian', 'Mimpi buruk', 'Kecemasan berlebih', 'Menghindari tempat/situasi tertentu', 'Kesulitan percaya']
+  },
+  {
+    id: 5,
+    name: 'Kecanduan',
+    image: kecanduanImg.src,
+    description: 'Kecanduan adalah kondisi kompleks yang mempengaruhi otak dan perilaku. Meski sulit, dengan tekad dan bantuan profesional, kecanduan dapat diatasi. Langkah pertama adalah mengakui dan mencari bantuan. 🌟',
+    symptoms: ['Kehilangan kontrol', 'Perubahan prioritas', 'Gejala putus zat', 'Pengabaian tanggung jawab', 'Isolasi sosial']
+  },
+];
+
+export default function HomePage() {
+  const [selectedCondition, setSelectedCondition] = useState<string | null>(null);
+  const [particles, setParticles] = useState<Array<{ top: number; left: number; duration: number; delay: number }>>([]);
+  const [isClient, setIsClient] = useState(false);
+  const detailsRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    // Generate particles only on client side to avoid hydration mismatch
+    const generatedParticles = [...Array(20)].map(() => ({
+      top: Math.random() * 100,
+      left: Math.random() * 100,
+      duration: 3 + Math.random() * 2,
+      delay: Math.random() * 2,
+    }));
+    setParticles(generatedParticles);
+    setIsClient(true);
+  }, []);
+
+  // Auto-scroll to details when a condition is selected
+  useEffect(() => {
+    if (!selectedCondition) return;
+    // wait for the details section to mount
+    const id = window.setTimeout(() => {
+      detailsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+    return () => window.clearTimeout(id);
+  }, [selectedCondition]);
+
+  // Motion variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+  };
+  const fadeUp = {
+    hidden: { opacity: 0, y: 50 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  };
+  const cardVariant = {
+    hidden: { opacity: 0, scale: 0.9 },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.4 } },
+    hover: { y: -15, scale: 1.05, transition: { duration: 0.2 } },
+  };
+
+  return (
+    <section className="min-h-screen bg-gradient-to-b from-[#B3E5FC] to-[#FFF3E0] relative">
+      <motion.div className="relative" initial="hidden" animate="visible" variants={containerVariants}>
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div className="relative w-full pb-24" variants={fadeUp}>
+            {isClient && (
+              <motion.div className="absolute inset-0 pointer-events-none" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                {particles.map((particle, i) => (
+                  <motion.div
+                    key={i}
+                    className="absolute w-2 h-2 bg-white/20 rounded-full"
+                    style={{
+                      top: `${particle.top}%`,
+                      left: `${particle.left}%`,
+                    }}
+                    animate={{ y: [0, -30, 0], opacity: [0.2, 0.5, 0.2] }}
+                    transition={{ duration: particle.duration, repeat: Infinity, delay: particle.delay }}
+                  />
+                ))}
+              </motion.div>
+            )}
+
+            <div className="w-full max-w-[1280px] mx-auto">
+              <div className="pt-32 pb-16">
+                <motion.div className="flex flex-col justify-center" variants={containerVariants}>
+                  <motion.h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#1E498E] mb-2 relative" variants={fadeUp}>
+                    Hai Tenang Jiwa.
+                    <motion.span className="absolute -left-4 -top-4 w-20 h-20 bg-pink-500/10 rounded-full blur-xl" animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }} transition={{ duration: 4, repeat: Infinity }} />
+                  </motion.h1>
+                  <motion.h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#1E498E] mb-6 relative" variants={fadeUp}>
+                    Bagaimana Kabar Kamu Hari Ini?
+                    <motion.span className="absolute -left-4 -top-4 w-20 h-20 bg-pink-500/10 rounded-full blur-xl" animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }} transition={{ duration: 4, repeat: Infinity }} />
+                  </motion.h2>
+                  <motion.p className="text-xl md:text-2xl text-[#1E498E] mb-12 relative italic" variants={fadeUp}>
+                    Kenali perasaan jiwa kamu
+                    <motion.span className="absolute -left-4 -top-4 w-20 h-20 bg-pink-500/10 rounded-full blur-xl" animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }} transition={{ duration: 4, repeat: Infinity }} />
+                  </motion.p>
+
+                  <motion.div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 mb-8" variants={containerVariants}>
+                    {conditions.map((condition) => (
+                      <motion.button
+                        key={condition.id}
+                        onClick={() => setSelectedCondition(condition.name)}
+                        variants={cardVariant}
+                        whileHover="hover"
+                        className={`relative h-48 md:h-64 overflow-hidden rounded-[32px] transition-all duration-300
+                          ${selectedCondition === condition.name ? 'ring-4 ring-[#1E498E]/40' : ''}
+                          group shadow-lg backdrop-blur-sm`}
+                      >
+                        <motion.div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#FFF3E0]" whileHover={{ scale: 1.1, rotate: 3 }} transition={{ type: 'spring', stiffness: 300, damping: 20 }} />
+
+                        <motion.div className="absolute inset-0 flex items-center justify-center" whileHover={{ scale: 1.1, rotate: 3 }} transition={{ type: 'spring', stiffness: 300, damping: 20 }}>
+                          <Image
+                            src={condition.image}
+                            alt={condition.name}
+                            width={200}
+                            height={200}
+                            className="max-w-full max-h-full object-contain p-4"
+                          />
+                        </motion.div>
+
+                        <div
+                          className="absolute bottom-0 left-0 right-0 h-1/2"
+                          style={{
+                            background: 'linear-gradient(to top, #FFF3E0 20%, #FFF3E0 10%, transparent 100%)'
+                          }}
+                        />
+
+                        <motion.div className="absolute bottom-0 left-0 right-0 p-4 md:p-6" whileHover={{ y: -5 }}>
+                          <motion.span className="text-[#1E498E] text-lg md:text-2xl font-semibold block" whileHover={{ scale: 1.05 }}>
+                            {condition.name}
+                          </motion.span>
+                        </motion.div>
+
+                        <motion.div className="absolute top-4 right-4 w-3 h-3 rounded-full bg-white opacity-0 group-hover:opacity-100" initial={{ scale: 0 }} whileHover={{ scale: 1 }} transition={{ duration: 0.2 }} />
+                      </motion.button>
+                    ))}
+                  </motion.div>
+                </motion.div>
+              </div>
+
+              <AnimatePresence mode="wait">
+                {selectedCondition && (
+                  <motion.div
+                    key={selectedCondition}
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="mb-32"
+                    ref={detailsRef}
+                  >
+                    <motion.h2 initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} className="text-2xl md:text-3xl font-bold mb-6 uppercase bg-clip-text text-transparent bg-gradient-to-r from-[#1E498E] to-pink-500">
+                      {selectedCondition}
+                    </motion.h2>
+
+                    <motion.div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 md:p-8 shadow-xl relative overflow-hidden" whileHover={{ scale: 1.01 }}>
+                      <motion.div className="absolute inset-0 bg-gradient-to-r from-pink-500/5 to-purple-500/5" animate={{ backgroundPosition: ['0% 0%', '100% 100%'] }} transition={{ duration: 15, repeat: Infinity, repeatType: 'reverse' }} />
+
+                      <div className="relative z-10">
+                        <motion.p className="text-[#1E498E] text-base md:text-lg mb-8 leading-relaxed" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
+                          {conditions.find(c => c.name === selectedCondition)?.description}
+                        </motion.p>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+                          {conditions.find(c => c.name === selectedCondition)?.symptoms.map((symptom, index) => (
+                            <motion.div key={symptom} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.1 }} className="flex items-center space-x-3 group">
+                              <motion.div className="w-2 h-2 bg-pink-400 rounded-full" animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 2, repeat: Infinity, delay: index * 0.2 }} />
+                              <span className="text-[#1E498E] text-sm md:text-base group-hover:text-pink-500 transition-colors">
+                                {symptom}
+                              </span>
+                            </motion.div>
+                          ))}
+                        </div>
+                      </div>
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </motion.div>
+        </div>
+      </motion.div>
+    </section>
+  );
+}
