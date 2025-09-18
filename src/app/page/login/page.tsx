@@ -1,25 +1,255 @@
-'use client';
+"use client"
 
-import Link from 'next/link';
+import type React from "react"
+
+import Link from "next/link"
+import { motion } from "framer-motion"
+import { useState } from "react"
 
 export default function LoginPage() {
+  const [isLoading, setIsLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  })
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    // Simulate loading
+    setTimeout(() => setIsLoading(false), 2000)
+  }
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const getProgressCount = () => {
+    let count = 0
+    if (formData.email.trim()) count++
+    if (formData.password.trim()) count++
+    return count
+  }
+
   return (
-    <main className="min-h-[70vh] pt-28 pb-16 px-4 sm:px-6 lg:px-8 max-w-md mx-auto">
-      <h1 className="text-3xl font-bold text-[#1E498E] mb-6">Masuk</h1>
-      <form className="bg-white/70 backdrop-blur-md rounded-2xl border border-black/10 p-6 space-y-4">
-        <div>
-          <label className="block text-sm text-black/70 mb-1">Email</label>
-          <input type="email" className="w-full rounded-lg border border-black/10 px-3 py-2 outline-none focus:ring-2 focus:ring-[#1E498E]/40 bg-white" placeholder="you@mail.com" />
-        </div>
-        <div>
-          <label className="block text-sm text-black/70 mb-1">Kata sandi</label>
-          <input type="password" className="w-full rounded-lg border border-black/10 px-3 py-2 outline-none focus:ring-2 focus:ring-[#1E498E]/40 bg-white" placeholder="••••••••" />
-        </div>
-        <button type="submit" className="w-full bg-[#1E498E] text-white py-2 rounded-lg hover:opacity-95">Masuk</button>
-        <p className="text-sm text-black/60 text-center">Belum punya akun? <Link href="/page/signup" className="text-[#1E498E] underline">Daftar</Link></p>
-      </form>
-    </main>
-  );
+    <div className="min-h-screen bg-gradient-to-br from-[#B3E5FC] via-[#FFF3E0] to-[#B3E5FC] flex items-center justify-center p-4">
+      {/* Background decorative elements */}
+      <motion.div
+        className="absolute top-20 left-20 w-32 h-32 bg-[#B3E5FC]/30 rounded-full blur-xl"
+        animate={{
+          scale: [1, 1.2, 1],
+          opacity: [0.3, 0.6, 0.3],
+        }}
+        transition={{
+          duration: 4,
+          repeat: Number.POSITIVE_INFINITY,
+          ease: "easeInOut",
+        }}
+      />
+      <motion.div
+        className="absolute bottom-20 right-20 w-40 h-40 bg-[#FFF3E0]/40 rounded-full blur-xl"
+        animate={{
+          scale: [1.2, 1, 1.2],
+          opacity: [0.4, 0.7, 0.4],
+        }}
+        transition={{
+          duration: 5,
+          repeat: Number.POSITIVE_INFINITY,
+          ease: "easeInOut",
+        }}
+      />
+
+      <motion.main
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="w-full max-w-md"
+      >
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.6 }}
+          className="text-center mb-8"
+        >
+          <h1 className="text-4xl font-bold text-[#1E498E] mb-2">Masuk</h1>
+          <p className="text-[#1E498E]/70">Selamat datang kembali!</p>
+        </motion.div>
+
+        {/* Form Container */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.3, duration: 0.6 }}
+          className="bg-white/80 backdrop-blur-lg rounded-3xl border border-white/50 shadow-2xl p-8"
+        >
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Email Field */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+            >
+              <label className="block text-sm font-medium text-[#1E498E] mb-2">Email</label>
+              <motion.input
+                whileFocus={{ scale: 1.02 }}
+                type="email"
+                value={formData.email}
+                onChange={(e) => handleInputChange("email", e.target.value)}
+                className="w-full rounded-xl border-2 border-[#B3E5FC]/50 px-4 py-3 outline-none focus:border-[#1E498E] focus:ring-4 focus:ring-[#1E498E]/20 bg-white/70 text-[#1E498E] placeholder-[#1E498E]/50 transition-all duration-300"
+                placeholder="you@mail.com"
+                required
+              />
+            </motion.div>
+
+            {/* Password Field */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5, duration: 0.5 }}
+            >
+              <label className="block text-sm font-medium text-[#1E498E] mb-2">Kata sandi</label>
+              <div className="relative">
+                <motion.input
+                  whileFocus={{ scale: 1.02 }}
+                  type={showPassword ? "text" : "password"}
+                  value={formData.password}
+                  onChange={(e) => handleInputChange("password", e.target.value)}
+                  className="w-full rounded-xl border-2 border-[#B3E5FC]/50 px-4 py-3 pr-12 outline-none focus:border-[#1E498E] focus:ring-4 focus:ring-[#1E498E]/20 bg-white/70 text-[#1E498E] placeholder-[#1E498E]/50 transition-all duration-300"
+                  placeholder="••••••••"
+                  required
+                />
+                <motion.button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#1E498E]/60 hover:text-[#1E498E] transition-colors duration-200"
+                >
+                  {showPassword ? (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"
+                      />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                      />
+                    </svg>
+                  )}
+                </motion.button>
+                {formData.password && (
+                  <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className="mt-2">
+                    <div className="flex space-x-1">
+                      {[1, 2, 3, 4].map((level) => (
+                        <div
+                          key={level}
+                          className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+                            formData.password.length >= level * 2
+                              ? level <= 2
+                                ? "bg-red-400"
+                                : level === 3
+                                  ? "bg-yellow-400"
+                                  : "bg-green-400"
+                              : "bg-gray-200"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </div>
+            </motion.div>
+
+            {/* Submit Button */}
+            <motion.button
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
+              whileHover={{ scale: 1.02, boxShadow: "0 10px 30px rgba(30, 73, 142, 0.3)" }}
+              whileTap={{ scale: 0.98 }}
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-gradient-to-r from-[#1E498E] to-[#1E498E]/80 text-white py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              {isLoading ? (
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                  className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full mx-auto"
+                />
+              ) : (
+                "Masuk"
+              )}
+            </motion.button>
+
+            {/* Sign up link */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7, duration: 0.5 }}
+              className="text-sm text-[#1E498E]/70 text-center"
+            >
+              Belum punya akun?{" "}
+              <Link
+                href="/page/signup"
+                className="text-[#1E498E] font-semibold hover:underline transition-all duration-300"
+              >
+                Daftar
+              </Link>
+            </motion.p>
+          </form>
+        </motion.div>
+
+        {/* Footer decoration */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8, duration: 0.5 }}
+          className="text-center mt-8"
+        >
+          <div className="flex items-center justify-center space-x-2">
+            {[0, 1].map((index) => (
+              <motion.div
+                key={index}
+                className={`w-3 h-3 rounded-full transition-all duration-500 ${
+                  getProgressCount() > index ? "bg-[#1E498E] shadow-lg shadow-[#1E498E]/30" : "bg-[#1E498E]/20"
+                }`}
+                animate={{
+                  scale: getProgressCount() > index ? [1, 1.2, 1] : 1,
+                }}
+                transition={{
+                  duration: 0.3,
+                  ease: "easeInOut",
+                }}
+              />
+            ))}
+          </div>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1, duration: 0.5 }}
+            className="text-xs text-[#1E498E]/50 mt-2"
+          >
+            {getProgressCount()}/2 field completed
+          </motion.p>
+        </motion.div>
+      </motion.main>
+    </div>
+  )
 }
-
-

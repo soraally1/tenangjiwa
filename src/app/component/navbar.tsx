@@ -70,17 +70,17 @@ export default function Navbar() {
             </svg>
             <span className="text-xs mt-0.5">AI</span>
           </Link>
-          <Link href="/page/login" className={`flex flex-col items-center justify-center py-2 rounded-xl ${pathname === '/page/login' ? 'text-[#1E498E] bg-[#1E498E]/10' : 'text-black/70'}`}>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-              <path fillRule="evenodd" d="M3.75 4.5A2.25 2.25 0 016 2.25h6A2.25 2.25 0 0114.25 4.5v15a.75.75 0 01-1.5 0V4.5A.75.75 0 0012 3.75H6A.75.75 0 005.25 4.5v15a.75.75 0 01-1.5 0v-15zm9.72 8.28a.75.75 0 010 1.06l-3 3a.75.75 0 11-1.06-1.06L11.44 13.5H21a.75.75 0 000-1.5h-9.56l1.97-1.97a.75.75 0 011.06 0z" clipRule="evenodd" />
-            </svg>
-            <span className="text-xs mt-0.5">Masuk</span>
-          </Link>
           <Link href="/konsultasi" className={`flex flex-col items-center justify-center py-2 rounded-xl ${pathname === '/konsultasi' ? 'text-[#1E498E] bg-[#1E498E]/10' : 'text-black/70'}`}>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
               <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm6.967-2.28a.75.75 0 10-1.06 1.06L11.31 14l4.97-4.97a.75.75 0 00-1.06-1.06L11.31 11.88 9.217 9.72z" clipRule="evenodd" />
             </svg>
             <span className="text-xs mt-0.5">Konsultasi</span>
+          </Link>
+          <Link href="/page/login" className={`flex flex-col items-center justify-center py-2 rounded-xl ${pathname === '/page/login' ? 'text-[#1E498E] bg-[#1E498E]/10' : 'text-black/70'}`}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+              <path fillRule="evenodd" d="M3.75 4.5A2.25 2.25 0 016 2.25h6A2.25 2.25 0 0114.25 4.5v15a.75.75 0 01-1.5 0V4.5A.75.75 0 0012 3.75H6A.75.75 0 005.25 4.5v15a.75.75 0 01-1.5 0v-15zm9.72 8.28a.75.75 0 010 1.06l-3 3a.75.75 0 11-1.06-1.06L11.44 13.5H21a.75.75 0 000-1.5h-9.56l1.97-1.97a.75.75 0 011.06 0z" clipRule="evenodd" />
+            </svg>
+            <span className="text-xs mt-0.5">Masuk</span>
           </Link>
         </div>
       </div>
