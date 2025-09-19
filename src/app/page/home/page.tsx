@@ -126,15 +126,15 @@ export default function HomePage() {
               <div className="pt-32 pb-16">
                 <motion.div className="flex flex-col justify-center" variants={containerVariants}>
                   <motion.h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#1E498E] mb-2 relative" variants={fadeUp}>
-                    Hai Tenang Jiwa.
+                    Hai Sahabat Jiwa 
                     <motion.span className="absolute -left-4 -top-4 w-20 h-20 bg-pink-500/10 rounded-full blur-xl" animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }} transition={{ duration: 4, repeat: Infinity }} />
                   </motion.h1>
                   <motion.h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#1E498E] mb-6 relative" variants={fadeUp}>
                     Bagaimana Kabar Kamu Hari Ini?
                     <motion.span className="absolute -left-4 -top-4 w-20 h-20 bg-pink-500/10 rounded-full blur-xl" animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }} transition={{ duration: 4, repeat: Infinity }} />
                   </motion.h2>
-                  <motion.p className="text-xl md:text-2xl text-[#1E498E] mb-12 relative italic" variants={fadeUp}>
-                    Kenali perasaan jiwa kamu
+                  <motion.p className="text-xl md:text-2xl text-[#1E498E] mb-12 relative " variants={fadeUp}>
+                    Kenali perasaan jiwa kamu yuk! 😉
                     <motion.span className="absolute -left-4 -top-4 w-20 h-20 bg-pink-500/10 rounded-full blur-xl" animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }} transition={{ duration: 4, repeat: Infinity }} />
                   </motion.p>
 
