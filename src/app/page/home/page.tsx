@@ -350,9 +350,11 @@ export default function HomePage() {
                 className="relative group"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-[#1E498E]/20 to-transparent rounded-2xl transform rotate-1 group-hover:rotate-2 transition-transform duration-300"></div>
-                <img
-                  src="/dr-yossy.jpg"
+                <Image
+                  src="/dokter.png"
                   alt="Professional Psychiatrist"
+                  width={600}
+                  height={400}
                   className="w-full h-[400px] object-cover rounded-2xl shadow-2xl relative z-10"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#FFF3E0]/80 via-transparent to-transparent rounded-2xl z-20"></div>
@@ -438,13 +440,13 @@ export default function HomePage() {
                 transition={{ duration: 0.3 }}
                 className="relative group"
               >
-                <div className="absolute inset-0 bg-gradient-to-l from-pink-500/20 to-transparent rounded-2xl transform -rotate-1 group-hover:-rotate-2 transition-transform duration-300"></div>
-                <img
-                  src="/friendly-ai-mascot-owl-character-with-modern-tech-.jpg"
+                <Image
+                  src="/Tenjin.png"
                   alt="AI Consultation Assistant"
-                  className="w-full h-[400px] object-cover rounded-2xl shadow-2xl relative z-10"
+                  width={600}
+                  height={400}
+                  className="w-full h-[400px] object-contain rounded-2xl relative z-10"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#FFF3E0]/80 via-transparent to-transparent rounded-2xl z-20"></div>
               </motion.div>
             </div>
 
@@ -458,10 +460,10 @@ export default function HomePage() {
                 <span className="inline-block px-4 py-2 bg-pink-500/10 text-pink-600 rounded-full text-sm font-medium mb-4">
                   AI Assistant
                 </span>
-                <h3 className="text-3xl md:text-4xl font-bold text-[#1E498E] mb-4">Dr.Men AI Assistant</h3>
+                <h3 className="text-3xl md:text-4xl font-bold text-[#1E498E] mb-4">TenJin</h3>
                 <p className="text-lg text-[#1E498E]/80 mb-6 leading-relaxed">
-                  Konsultasi awal dengan AI yang telah dilatih khusus untuk kesehatan mental. Dapatkan penilaian cepat
-                  dan rekomendasi langkah selanjutnya.
+                  Konsultasi awal dengan TenJin, SahabatJiwa yang telah dilatih khusus untuk kesehatan mental. Dapatkan penilaian cepat
+                  dan rekomendasi langkah selanjutnya. serta bisa menjadi teman kamu untuk berbagi perasaan.
                 </p>
               </motion.div>
 

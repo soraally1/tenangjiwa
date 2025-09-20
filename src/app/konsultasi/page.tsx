@@ -28,22 +28,17 @@ interface BookedSlots {
   }
 }
 
-interface User {
-  uid: string
-  email: string
-  displayName?: string
-}
 
 const CONSULTATION_PRICE = 25000
 
 const doctors: Doctor[] = [
   {
-    id: "dr-stevanus",
-    name: "dr. Stevanus Ingwantoro",
+    id: "dr-Iqbal-Bayu-Aji",
+    name: "dr. Iqbal Bayu Aji",
     specialty: "Sp.KJ - Psikiater",
     experience: "20+ tahun pengalaman",
     rating: 4.9,
-    image: "/dr-Stevanus.png",
+    image: "/BannerIqbal.png",
     description:
       "Salah satu psikiater terbaik di Jakarta dengan pengalaman lebih dari 20 tahun dalam menangani berbagai kasus kesehatan mental.",
     schedules: [
@@ -53,12 +48,12 @@ const doctors: Doctor[] = [
     ],
   },
   {
-    id: "dr-yossy",
-    name: "dr. Yossy Agustanti",
+    id: "dr-Banon-Kenta-Oktora",
+    name: "dr. Banon Kenta Oktora",
     specialty: "Sp.KJ - Psikiater",
     experience: "15+ tahun pengalaman",
     rating: 4.8,
-    image: "/dr-yossy.jpg",
+    image: "/BannerBanon.png",
     description:
       "Psikiater berpengalaman yang aktif dalam mengatasi stigma kesehatan mental dan memberikan pelayanan terbaik.",
     schedules: [
@@ -77,10 +72,7 @@ export default function Konsultasi() {
   const [selectedPayment, setSelectedPayment] = useState<string | null>(null)
   const [paymentStep, setPaymentStep] = useState(1)
   const [processingPayment, setProcessingPayment] = useState(false)
-  const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [bookedSlots, setBookedSlots] = useState<BookedSlots>({})
+  const [bookedSlots] = useState<BookedSlots>({})
 
   // Animation variants
   const containerVariants = {
@@ -101,7 +93,7 @@ export default function Konsultasi() {
       y: 0,
       transition: {
         duration: 0.5,
-        ease: "easeOut",
+        ease: "easeOut" as const,
       },
     },
   }
@@ -112,7 +104,7 @@ export default function Konsultasi() {
       transition: {
         duration: 3,
         repeat: Number.POSITIVE_INFINITY,
-        ease: "easeInOut",
+        ease: "easeInOut" as const,
       },
     },
   }
@@ -403,15 +395,6 @@ export default function Konsultasi() {
           )}
         </AnimatePresence>
 
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-red-500 text-sm text-center bg-red-50 p-3 rounded-lg"
-          >
-            {error}
-          </motion.div>
-        )}
       </motion.div>
     )
   }
@@ -466,11 +449,11 @@ export default function Konsultasi() {
 
           </motion.div>
 
-          {/* Main Content - New Layout */}
-          <div className="grid xl:grid-cols-5 gap-8">
+          {/* Main Content - Enhanced Layout */}
+          <div className="grid lg:grid-cols-5 gap-8">
 
             {/* Left Column - Doctor Selection */}
-            <motion.div className="xl:col-span-3 space-y-8" variants={itemVariants}>
+            <motion.div className="lg:col-span-3 space-y-8" variants={itemVariants}>
 
               {/* Section Header */}
               <div className="flex items-center justify-between">
@@ -486,86 +469,107 @@ export default function Konsultasi() {
                 </motion.div>
               </div>
 
-              {/* Enhanced Doctor Cards */}
-              <div className="space-y-6">
+              {/* Enhanced Doctor Cards - Horizontal Banner Style */}
+              <div className="space-y-8">
                 {doctors.map((doctor, index) => (
                   <motion.div
                     key={doctor.id}
                     initial={{ opacity: 0, x: -50 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.6, delay: index * 0.2 }}
-                    whileHover={{ scale: 1.02, y: -5 }}
+                    whileHover={{ scale: 1.02, y: -8 }}
                     onClick={() => setSelectedDoctor(doctor)}
                     className={`relative overflow-hidden rounded-3xl cursor-pointer transition-all duration-500 group ${selectedDoctor?.id === doctor.id
                         ? "ring-4 ring-[#1E498E] shadow-2xl bg-gradient-to-r from-white to-[#B3E5FC]/40"
-                        : "shadow-lg hover:shadow-2xl bg-gradient-to-r from-white/90 to-white/60 backdrop-blur-sm"
+                        : "shadow-xl hover:shadow-2xl bg-gradient-to-r from-white/95 to-white/80 backdrop-blur-sm"
                       }`}
                   >
-                    <div className="p-8">
-                      <div className="flex items-start gap-6">
-
-                        {/* Doctor Image */}
-                        <motion.div
-                          className="relative"
-                          whileHover={{ scale: 1.1 }}
-                        >
-                          <div className="w-24 h-24 rounded-2xl overflow-hidden bg-gradient-to-br from-[#B3E5FC] to-[#FFF3E0] p-1">
-                            <div className="w-full h-full rounded-xl overflow-hidden">
-                              <Image
-                                src={doctor.image || "/placeholder.svg"}
-                                alt={doctor.name}
-                                width={96}
-                                height={96}
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                          </div>
+                    {/* Horizontal Banner Layout */}
+                    <div className="flex flex-col md:flex-row h-auto md:h-48">
+                      {/* Doctor Image - Horizontal Banner */}
+                      <motion.div
+                        className="relative w-full md:w-80 h-48 md:h-full flex-shrink-0"
+                        whileHover={{ scale: 1.05 }}
+                      >
+                        <div className="w-full h-full relative overflow-hidden">
+                          <Image
+                            src={doctor.image || "/placeholder.svg"}
+                            alt={doctor.name}
+                            fill
+                            className="object-cover"
+                          />
+                          {/* Gradient Overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-r from-[#1E498E]/20 to-transparent" />
+                          
+                          {/* Selection Indicator */}
                           {selectedDoctor?.id === doctor.id && (
                             <motion.div
                               initial={{ scale: 0 }}
                               animate={{ scale: 1 }}
-                              className="absolute -top-2 -right-2 w-8 h-8 bg-[#1E498E] rounded-full flex items-center justify-center"
+                              className="absolute top-4 right-4 w-10 h-10 bg-[#1E498E] rounded-full flex items-center justify-center shadow-lg"
                             >
-                              <CheckCircle className="w-5 h-5 text-white" />
+                              <CheckCircle className="w-6 h-6 text-white" />
                             </motion.div>
                           )}
-                        </motion.div>
 
-                        {/* Doctor Info */}
-                        <div className="flex-1">
-                          <div className="flex items-start justify-between mb-3">
-                            <div>
-                              <h3 className="text-2xl font-bold text-[#1E498E] mb-1">{doctor.name}</h3>
-                              <p className="text-[#1E498E]/70 font-medium">{doctor.specialty}</p>
+                          {/* Rating Badge */}
+                          <div className="absolute bottom-4 left-4 flex items-center gap-2 bg-white/90 backdrop-blur-sm px-3 py-2 rounded-full">
+                            <Star className="text-yellow-400 w-4 h-4 fill-current" />
+                            <span className="font-bold text-[#1E498E] text-sm">{doctor.rating}</span>
+                          </div>
+                        </div>
+                      </motion.div>
+
+                      {/* Doctor Info Section */}
+                      <div className="flex-1 p-6 md:p-8 flex flex-col justify-between">
+                        <div>
+                          <div className="mb-4">
+                            <h3 className="text-2xl md:text-3xl font-bold text-[#1E498E] mb-2">{doctor.name}</h3>
+                            <p className="text-[#1E498E]/70 font-semibold text-base md:text-lg">{doctor.specialty}</p>
+                          </div>
+
+                          <p className="text-[#1E498E]/80 leading-relaxed text-sm md:text-base mb-4 md:mb-6 line-clamp-2">
+                            {doctor.description}
+                          </p>
+
+                          <div className="flex items-center gap-2 text-[#1E498E]/60 mb-4 md:mb-6">
+                            <Clock className="w-4 h-4 md:w-5 md:h-5" />
+                            <span className="font-medium text-sm md:text-base">{doctor.experience}</span>
+                          </div>
+                        </div>
+
+                        {/* Action Button */}
+                        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                          <div className="flex items-center gap-2 md:gap-4">
+                            <div className="flex items-center gap-2 bg-[#B3E5FC]/30 px-3 py-2 rounded-full">
+                              <Award className="w-3 h-3 md:w-4 md:h-4 text-[#1E498E]" />
+                              <span className="text-xs md:text-sm font-medium text-[#1E498E]">Terpercaya</span>
                             </div>
-                            <div className="flex items-center gap-2 bg-yellow-50 px-3 py-1 rounded-full">
-                              <Star className="text-yellow-400 w-4 h-4 fill-current" />
-                              <span className="font-bold text-[#1E498E]">{doctor.rating}</span>
+                            <div className="flex items-center gap-2 bg-[#FFF3E0]/50 px-3 py-2 rounded-full">
+                              <Users className="w-3 h-3 md:w-4 md:h-4 text-[#1E498E]" />
+                              <span className="text-xs md:text-sm font-medium text-[#1E498E]">500+ Pasien</span>
                             </div>
                           </div>
 
-                          <p className="text-[#1E498E]/80 mb-4 leading-relaxed">{doctor.description}</p>
-
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2 text-[#1E498E]/60">
-                              <Clock className="w-4 h-4" />
-                              <span className="text-sm font-medium">{doctor.experience}</span>
-                            </div>
-
-                            <motion.button
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                              className={`px-6 py-3 rounded-2xl font-semibold transition-all ${selectedDoctor?.id === doctor.id
-                                  ? "bg-[#1E498E] text-white shadow-lg"
-                                  : "bg-[#B3E5FC] text-[#1E498E] hover:bg-[#1E498E] hover:text-white"
-                                }`}
-                            >
-                              {selectedDoctor?.id === doctor.id ? "Terpilih" : "Pilih Dokter"}
-                            </motion.button>
-                          </div>
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className={`w-full md:w-auto px-6 md:px-8 py-3 md:py-4 rounded-2xl font-bold text-base md:text-lg transition-all shadow-lg ${selectedDoctor?.id === doctor.id
+                                ? "bg-[#1E498E] text-white shadow-[#1E498E]/30"
+                                : "bg-gradient-to-r from-[#1E498E] to-[#3B82F6] text-white hover:from-[#1E498E]/90 hover:to-[#3B82F6]/90"
+                              }`}
+                          >
+                            {selectedDoctor?.id === doctor.id ? "✓ Terpilih" : "KONSULTASI"}
+                          </motion.button>
                         </div>
                       </div>
                     </div>
+
+                    {/* Bottom Border Effect */}
+                    <div className={`absolute bottom-0 left-0 right-0 h-1 ${selectedDoctor?.id === doctor.id
+                        ? "bg-gradient-to-r from-[#1E498E] to-[#3B82F6]"
+                        : "bg-gradient-to-r from-[#B3E5FC] to-[#FFF3E0]"
+                      }`} />
                   </motion.div>
                 ))}
               </div>
@@ -573,7 +577,7 @@ export default function Konsultasi() {
               {/* Enhanced Promotional Banner */}
               <motion.div
                 variants={itemVariants}
-                className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#1E498E] via-[#1E498E]/90 to-[#1E498E]/80 p-8 text-white"
+                className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#1E498E] via-[#1E498E]/90 to-[#1E498E]/80 p-6 md:p-8 text-white"
                 whileHover={{ scale: 1.02 }}
               >
                 <motion.div
@@ -587,10 +591,10 @@ export default function Konsultasi() {
                   transition={{ duration: 15, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
                 />
 
-                <div className="relative z-10 flex items-center justify-between">
+                <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                   <div>
-                    <h3 className="text-3xl font-bold mb-2">Promo Spesial!</h3>
-                    <p className="text-xl mb-4 opacity-90">Diskon 50% untuk konsultasi pertama</p>
+                    <h3 className="text-2xl md:text-3xl font-bold mb-2">Promo Spesial!</h3>
+                    <p className="text-lg md:text-xl mb-4 opacity-90">Diskon 50% untuk konsultasi pertama</p>
                     <div className="flex items-center gap-2 text-sm opacity-80">
                       <Clock className="w-4 h-4" />
                       <span>Berlaku hingga akhir bulan</span>
@@ -599,7 +603,7 @@ export default function Konsultasi() {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="bg-white text-[#1E498E] px-8 py-4 rounded-2xl font-bold text-lg shadow-lg"
+                    className="w-full md:w-auto bg-white text-[#1E498E] px-6 md:px-8 py-3 md:py-4 rounded-2xl font-bold text-base md:text-lg shadow-lg"
                   >
                     Klaim Sekarang
                   </motion.button>
@@ -610,7 +614,7 @@ export default function Konsultasi() {
             {/* Right Column - Enhanced Booking Panel */}
             <motion.div
               variants={itemVariants}
-              className="xl:col-span-2 space-y-6"
+              className="lg:col-span-2 space-y-6"
             >
               <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-8 shadow-2xl sticky top-24">
 

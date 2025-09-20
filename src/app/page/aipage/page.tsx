@@ -1,6 +1,7 @@
 "use client"
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import {
   Camera,
   Smile,
@@ -55,7 +56,7 @@ export default function AIEmotionScanner() {
     setIsClient(true);
   }, []);
 
-  const emotions: EmotionData[] = [
+  const emotions: EmotionData[] = useMemo(() => [
     {
       emotion: "Bahagia",
       confidence: 0.85,
@@ -91,7 +92,7 @@ export default function AIEmotionScanner() {
       color: "bg-red-500",
       bgGradient: "from-red-400/20 to-red-600/20"
     },
-  ];
+  ], []);
 
   const getAIResponse = (userMessage: string, currentEmotion?: EmotionData): string => {
     const emotionResponses = {
@@ -232,7 +233,7 @@ export default function AIEmotionScanner() {
       clearInterval(interval);
       clearInterval(durationInterval);
     };
-  }, [isScanning]);
+  }, [isScanning, emotions]);
 
   const FloatingElements = () => (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -277,173 +278,309 @@ export default function AIEmotionScanner() {
             <Brain className="text-[#1E498E] w-5 h-5" />
             <span className="text-[#1E498E] font-semibold">AI Analisis Emosi Terpercaya</span>
           </motion.div>
-
-          <h1 className="text-5xl md:text-6xl font-bold text-[#1E498E] mb-6 leading-tight">
-            Deteksi Emosi dengan
-            <span className="block bg-gradient-to-r from-[#1E498E] to-[#1E498E]/70 bg-clip-text text-transparent">
-              Teknologi AI Canggih
-            </span>
-          </h1>
-
-          <p className="text-xl text-[#1E498E]/70 max-w-3xl mx-auto leading-relaxed">
-            Analisis emosi real-time melalui ekspresi wajah menggunakan teknologi AI terdepan.
-            Dapatkan insight mendalam tentang kondisi emosional Anda dengan akurasi tinggi.
-          </p>
         </motion.div>
 
         {/* Main Content Grid */}
-        <div className="grid xl:grid-cols-3 gap-6 mb-8">
-          {/* Camera Section */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="xl:col-span-2"
-          >
-            <div className="bg-white/20 backdrop-blur-xl rounded-3xl border border-white/30 shadow-2xl overflow-hidden">
-              <div className="p-6 border-b border-white/20">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-[#1E498E] font-semibold text-xl flex items-center gap-3">
-                    <Eye className="w-6 h-6" />
-                    Live Camera Feed
-                  </h3>
-                  {isScanning && (
-                    <div className="flex items-center gap-2 text-[#1E498E]/70">
-                      <Clock className="w-4 h-4" />
-                      <span className="text-sm">{Math.floor(scanDuration / 60)}:{(scanDuration % 60).toString().padStart(2, '0')}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="p-6">
-                <div className="relative aspect-video bg-gradient-to-br from-gray-900 to-gray-700 rounded-2xl overflow-hidden shadow-inner">
-                  <video
-                    ref={videoRef}
-                    autoPlay
-                    playsInline
-                    muted
-                    className="w-full h-full object-cover"
-                  />
-
-                  {/* Scanning Animation */}
-                  <AnimatePresence>
-                    {isScanning && (
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="absolute inset-0"
-                      >
-                        <div className="absolute inset-0 border-2 border-green-400/50 rounded-2xl">
-                          <motion.div
-                            animate={{
-                              y: [0, "100%", 0],
-                              transition: { duration: 2, repeat: Infinity },
-                            }}
-                            className="w-full h-0.5 bg-gradient-to-r from-transparent via-green-400 to-transparent shadow-lg shadow-green-400/50"
-                          />
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+          {/* Left Column - Camera and Chat */}
+          <div className="col-span-1 lg:col-span-3 space-y-6">
+            {/* Camera Section */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+            >
+              {/* Camera */}
+              <div className="col-span-1 lg:col-span-2">
+                <div className="bg-white/20 backdrop-blur-xl rounded-3xl border border-white/30 shadow-2xl overflow-hidden">
+                  <div className="p-10 border-b border-white/20">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-[#1E498E] font-semibold text-xl flex items-center gap-3">
+                        <Eye className="w-6 h-6" />
+                        Live Camera Feed
+                      </h3>
+                      {isScanning && (
+                        <div className="flex items-center gap-2 text-[#1E498E]/70">
+                          <Clock className="w-8 h-8" />
+                          <span className="text-sm">{Math.floor(scanDuration / 60)}:{(scanDuration % 60).toString().padStart(2, '0')}</span>
                         </div>
+                      )}
+                    </div>
+                  </div>
 
-                        {/* Corner indicators */}
-                        <div className="absolute top-4 left-4 w-6 h-6 border-l-2 border-t-2 border-green-400"></div>
-                        <div className="absolute top-4 right-4 w-6 h-6 border-r-2 border-t-2 border-green-400"></div>
-                        <div className="absolute bottom-4 left-4 w-6 h-6 border-l-2 border-b-2 border-green-400"></div>
-                        <div className="absolute bottom-4 right-4 w-6 h-6 border-r-2 border-b-2 border-green-400"></div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  <div className="p-6">
+                    <div className="relative aspect-video bg-gradient-to-br from-gray-900 to-gray-700 rounded-2xl overflow-hidden shadow-inner">
+                      <video
+                        ref={videoRef}
+                        autoPlay
+                        playsInline
+                        muted
+                        className="w-full h-full object-cover"
+                      />
 
-                  {/* Emotion Display */}
-                  <AnimatePresence>
-                    {currentEmotion && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.8, y: -20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.8, y: -20 }}
-                        className="absolute top-6 left-6 right-6"
-                      >
-                        <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-white/40">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <div className={`w-12 h-12 ${currentEmotion.color} rounded-full flex items-center justify-center text-white shadow-lg`}>
-                                {currentEmotion.icon}
-                              </div>
-                              <div>
-                                <h4 className="font-semibold text-[#1E498E]">{currentEmotion.emotion}</h4>
-                                <p className="text-[#1E498E]/70 text-sm">Confidence: {Math.round(currentEmotion.confidence * 100)}%</p>
+                      {/* Scanning Animation */}
+                      <AnimatePresence>
+                        {isScanning && (
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0"
+                          >
+                            <div className="absolute inset-0 border-2 border-green-400/50 rounded-2xl">
+                              <motion.div
+                                animate={{
+                                  y: [0, "100%", 0],
+                                  transition: { duration: 2, repeat: Infinity },
+                                }}
+                                className="w-full h-0.5 bg-gradient-to-r from-transparent via-green-400 to-transparent shadow-lg shadow-green-400/50"
+                              />
+                            </div>
+
+                            {/* Corner indicators */}
+                            <div className="absolute top-4 left-4 w-6 h-6 border-l-2 border-t-2 border-green-400"></div>
+                            <div className="absolute top-4 right-4 w-6 h-6 border-r-2 border-t-2 border-green-400"></div>
+                            <div className="absolute bottom-4 left-4 w-6 h-6 border-l-2 border-b-2 border-green-400"></div>
+                            <div className="absolute bottom-4 right-4 w-6 h-6 border-r-2 border-b-2 border-green-400"></div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                      {/* Emotion Display */}
+                      <AnimatePresence>
+                        {currentEmotion && (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.8, y: -20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.8, y: -20 }}
+                            className="absolute top-6 left-6 right-6"
+                          >
+                            <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-white/40">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <div className={`w-12 h-12 ${currentEmotion.color} rounded-full flex items-center justify-center text-white shadow-lg`}>
+                                    {currentEmotion.icon}
+                                  </div>
+                                  <div>
+                                    <h4 className="font-semibold text-[#1E498E]">{currentEmotion.emotion}</h4>
+                                    <p className="text-[#1E498E]/70 text-sm">Confidence: {Math.round(currentEmotion.confidence * 100)}%</p>
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                    <motion.div
+                                      className={`h-full ${currentEmotion.color}`}
+                                      initial={{ width: 0 }}
+                                      animate={{ width: `${currentEmotion.confidence * 100}%` }}
+                                      transition={{ duration: 0.5 }}
+                                    />
+                                  </div>
+                                </div>
                               </div>
                             </div>
-                            <div className="text-right">
-                              <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                <motion.div
-                                  className={`h-full ${currentEmotion.color}`}
-                                  initial={{ width: 0 }}
-                                  animate={{ width: `${currentEmotion.confidence * 100}%` }}
-                                  transition={{ duration: 0.5 }}
-                                />
-                              </div>
-                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                      {/* No camera placeholder */}
+                      {!isScanning && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="text-center text-white/70">
+                            <Camera className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                            <p className="text-lg mb-2">Kamera tidak aktif</p>
+                            <p className="text-sm">Klik tombol &quot;Mulai Scan&quot; untuk memulai</p>
                           </div>
                         </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  {/* No camera placeholder */}
-                  {!isScanning && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="text-center text-white/70">
-                        <Camera className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                        <p className="text-lg mb-2">Kamera tidak aktif</p>
-                        <p className="text-sm">Klik tombol "Mulai Scan" untuk memulai</p>
-                      </div>
+                      )}
                     </div>
-                  )}
-                </div>
 
-                {/* Controls */}
-                <div className="flex flex-wrap gap-3 mt-6">
-                  {!isScanning ? (
-                    <motion.button
-                      onClick={startCamera}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="bg-[#1E498E] hover:bg-[#1E498E]/90 text-white px-6 py-3 rounded-xl font-medium flex items-center gap-2 transition-colors shadow-lg"
-                    >
-                      <Play className="w-5 h-5" />
-                      Mulai Scan
-                    </motion.button>
-                  ) : (
-                    <motion.button
-                      onClick={stopCamera}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-medium flex items-center gap-2 transition-colors shadow-lg"
-                    >
-                      <Pause className="w-5 h-5" />
-                      Stop Scan
-                    </motion.button>
-                  )}
+                    {/* Controls */}
+                    <div className="flex flex-wrap gap-3 mt-25">
+                      {!isScanning ? (
+                        <motion.button
+                          onClick={startCamera}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="bg-[#1E498E] hover:bg-[#1E498E]/90 text-white px-6 py-3 rounded-xl font-medium flex items-center gap-2 transition-colors shadow-lg"
+                        >
+                          <Play className="w-5 h-5" />
+                          Mulai Scan
+                        </motion.button>
+                      ) : (
+                        <motion.button
+                          onClick={stopCamera}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-medium flex items-center gap-2 transition-colors shadow-lg"
+                        >
+                          <Pause className="w-5 h-5" />
+                          Stop Scan
+                        </motion.button>
+                      )}
 
-                  <motion.button
-                    onClick={resetAnalysis}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="border-2 border-[#1E498E] text-[#1E498E] hover:bg-[#1E498E]/10 bg-white/50 backdrop-blur-sm px-6 py-3 rounded-xl font-medium flex items-center gap-2 transition-colors"
-                  >
-                    <RotateCcw className="w-5 h-5" />
-                    Reset
-                  </motion.button>
+                      <motion.button
+                        onClick={resetAnalysis}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="border-2 border-[#1E498E] text-[#1E498E] hover:bg-[#1E498E]/10 bg-white/50 backdrop-blur-sm px-6 py-3 rounded-xl font-medium flex items-center gap-2 transition-colors"
+                      >
+                        <RotateCcw className="w-5 h-5" />
+                        Reset
+                      </motion.button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </motion.div>
 
-          {/* Sidebar */}
+              {/* Mascot Card */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="col-span-1 lg:col-span-1"
+              >
+                <div className="bg-white/20 backdrop-blur-xl rounded-3xl border border-white/30 shadow-2xl p-6 h-full">
+                  <h3 className="text-[#1E498E] font-semibold text-xl mb-4 flex items-center gap-3">
+                    <Image 
+                      src="/Tenjin.svg" 
+                      alt="TenJin" 
+                      width={24}
+                      height={24}
+                      className="w-6 h-6" />
+                    TenJin
+                  </h3>
+                  
+                  <div className="text-center">
+                    <div className="w-64 h-64 mx-auto mb-4 rounded-full flex items-center justify-center p-4">
+                      <Image 
+                        src="/Tenjin.svg" 
+                        alt="TenJin" 
+                        width={96}
+                        height={96}
+                        className="w-full h-full object-contain" />
+                    </div>
+                    <h4 className="text-[#1E498E] font-semibold text-lg mb-2">TenJin</h4>
+                    <p className="text-[#1E498E]/70 text-sm leading-relaxed">
+                      Haii SahabatJiwa! Saya di sini untuk membantu Anda memahami dan mengelola emosi dengan lebih baik.
+                    </p>
+                    
+                    <div className="mt-4 p-3 bg-white/30 rounded-xl">
+                      <p className="text-xs text-[#1E498E]/70 mb-1">Status:</p>
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <span className="text-xs text-[#1E498E] font-medium">Online</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+
+            {/* Chat Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <div className="bg-white/20 backdrop-blur-xl rounded-3xl border border-white/30 shadow-2xl">
+                <div className="p-6 border-b border-white/20">
+                  <h3 className="text-[#1E498E] font-semibold text-xl flex items-center gap-3">
+                    <Image 
+                      src="/Tenjin.svg" 
+                      alt="TenJin" 
+                      width={24}
+                      height={24}
+                      className="w-6 h-6" />
+                    Chat dengan TenJin
+                  </h3>
+                  <p className="text-[#1E498E]/70 text-sm mt-1">AI akan merespons berdasarkan emosi yang terdeteksi</p>
+                </div>
+
+                <div className="h-80 overflow-y-auto p-6 space-y-4">
+                  {chatMessages.length === 0 && (
+                    <div className="text-center text-[#1E498E]/50 py-12">
+                      <MessageCircle className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                      <h4 className="text-lg font-medium mb-2">Mulai percakapan dengan AI!</h4>
+                      <p className="text-sm">Ceritakan perasaan Anda dan AI akan memberikan respons yang sesuai</p>
+                    </div>
+                  )}
+
+                  {chatMessages.map((message) => (
+                    <motion.div
+                      key={message.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
+                    >
+                      <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl shadow-lg ${message.sender === "user"
+                        ? "bg-[#1E498E] text-white"
+                        : "bg-white/80 text-[#1E498E] backdrop-blur-sm"
+                        }`}>
+                        <p className="text-sm leading-relaxed">{message.text}</p>
+                        <div className="flex items-center justify-between mt-2 gap-2">
+                          <span className="text-xs opacity-70">
+                            {message.timestamp.toLocaleTimeString("id-ID", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </span>
+                          {message.emotion && (
+                            <span className="text-xs bg-white/20 px-2 py-1 rounded-full">
+                              {message.emotion}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+
+                  {isTyping && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex justify-start"
+                    >
+                      <div className="bg-white/80 backdrop-blur-sm text-[#1E498E] px-4 py-3 rounded-2xl shadow-lg">
+                        <div className="flex space-x-1">
+                          <div className="w-2 h-2 bg-[#1E498E] rounded-full animate-bounce"></div>
+                          <div className="w-2 h-2 bg-[#1E498E] rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
+                          <div className="w-2 h-2 bg-[#1E498E] rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                  <div ref={chatEndRef} />
+                </div>
+
+                <div className="p-6 border-t border-white/20">
+                  <div className="flex gap-3">
+                    <input
+                      type="text"
+                      value={inputMessage}
+                      onChange={(e) => setInputMessage(e.target.value)}
+                      onKeyPress={(e) => e.key === "Enter" && sendMessage()}
+                      placeholder="Ceritakan perasaan Anda disini..."
+                      className="flex-1 px-4 py-3 border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1E498E] focus:border-transparent text-[#1E498E] bg-white/50 backdrop-blur-sm placeholder-[#1E498E]/50"
+                    />
+                    <motion.button
+                      onClick={sendMessage}
+                      disabled={!inputMessage.trim() || isTyping}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="bg-[#1E498E] hover:bg-[#1E498E]/90 disabled:bg-gray-400 text-white px-6 py-3 rounded-xl flex items-center gap-2 transition-colors shadow-lg disabled:cursor-not-allowed"
+                    >
+                      <Send className="w-5 h-5" />
+                    </motion.button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Right Column - Analysis Sections */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="space-y-6"
+            className="col-span-1 lg:col-span-1 space-y-6"
           >
             {/* Current Analysis */}
             <div className="bg-white/20 backdrop-blur-xl rounded-3xl border border-white/30 shadow-2xl p-6">
@@ -519,101 +656,6 @@ export default function AIEmotionScanner() {
             </div>
           </motion.div>
         </div>
-
-        {/* Chat Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <div className="bg-white/20 backdrop-blur-xl rounded-3xl border border-white/30 shadow-2xl">
-            <div className="p-6 border-b border-white/20">
-              <h3 className="text-[#1E498E] font-semibold text-xl flex items-center gap-3">
-                <MessageCircle className="w-6 h-6" />
-                Chat dengan siTenang
-              </h3>
-              <p className="text-[#1E498E]/70 text-sm mt-1">AI akan merespons berdasarkan emosi yang terdeteksi</p>
-            </div>
-
-            <div className="h-80 overflow-y-auto p-6 space-y-4">
-              {chatMessages.length === 0 && (
-                <div className="text-center text-[#1E498E]/50 py-12">
-                  <MessageCircle className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                  <h4 className="text-lg font-medium mb-2">Mulai percakapan dengan AI!</h4>
-                  <p className="text-sm">Ceritakan perasaan Anda dan AI akan memberikan respons yang sesuai</p>
-                </div>
-              )}
-
-              {chatMessages.map((message) => (
-                <motion.div
-                  key={message.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
-                >
-                  <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl shadow-lg ${message.sender === "user"
-                    ? "bg-[#1E498E] text-white"
-                    : "bg-white/80 text-[#1E498E] backdrop-blur-sm"
-                    }`}>
-                    <p className="text-sm leading-relaxed">{message.text}</p>
-                    <div className="flex items-center justify-between mt-2 gap-2">
-                      <span className="text-xs opacity-70">
-                        {message.timestamp.toLocaleTimeString("id-ID", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </span>
-                      {message.emotion && (
-                        <span className="text-xs bg-white/20 px-2 py-1 rounded-full">
-                          {message.emotion}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-
-              {isTyping && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="flex justify-start"
-                >
-                  <div className="bg-white/80 backdrop-blur-sm text-[#1E498E] px-4 py-3 rounded-2xl shadow-lg">
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-[#1E498E] rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-[#1E498E] rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-                      <div className="w-2 h-2 bg-[#1E498E] rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-              <div ref={chatEndRef} />
-            </div>
-
-            <div className="p-6 border-t border-white/20">
-              <div className="flex gap-3">
-                <input
-                  type="text"
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && sendMessage()}
-                  placeholder="Ceritakan perasaan Anda disini..."
-                  className="flex-1 px-4 py-3 border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1E498E] focus:border-transparent text-[#1E498E] bg-white/50 backdrop-blur-sm placeholder-[#1E498E]/50"
-                />
-                <motion.button
-                  onClick={sendMessage}
-                  disabled={!inputMessage.trim() || isTyping}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-[#1E498E] hover:bg-[#1E498E]/90 disabled:bg-gray-400 text-white px-6 py-3 rounded-xl flex items-center gap-2 transition-colors shadow-lg disabled:cursor-not-allowed"
-                >
-                  <Send className="w-5 h-5" />
-                </motion.button>
-              </div>
-            </div>
-          </div>
-        </motion.div>
       </div>
     </div>
   );
