@@ -3,8 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-
-// Import images - you'll need to add these to your public folder or assets
+import Link from 'next/link';
 import depresiImg from '../../../../public/mood/Depresi.png';
 import kecanduanImg from '../../../../public/mood/Kecanduan.png';
 import moodswingImg from '../../../../public/mood/MoodSwing.png';
@@ -352,7 +351,7 @@ export default function HomePage() {
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-[#1E498E]/20 to-transparent rounded-2xl transform rotate-1 group-hover:rotate-2 transition-transform duration-300"></div>
                 <img
-                  src="/professional-psychiatrist-doctor-in-white-coat-smi.jpg"
+                  src="/dr-yossy.jpg"
                   alt="Professional Psychiatrist"
                   className="w-full h-[400px] object-cover rounded-2xl shadow-2xl relative z-10"
                 />
@@ -416,7 +415,10 @@ export default function HomePage() {
                   whileTap={{ scale: 0.95 }}
                   className="bg-[#1E498E] text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:bg-[#1E498E]/90 transition-colors duration-300"
                 >
+                  <Link href="/konsultasi">
+                  
                   Konsultasi Sekarang 
+                  </Link>
                 </motion.button>
               </motion.div>
             </div>
