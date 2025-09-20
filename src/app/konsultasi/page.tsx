@@ -1,6 +1,6 @@
 "use client"
 import { motion, AnimatePresence } from "framer-motion"
-import { ChevronLeft, ChevronRight, CheckCircle, Calendar, Stethoscope, Star } from "lucide-react"
+import { ChevronLeft, ChevronRight, CheckCircle, Calendar, Stethoscope, Star, Clock, Award, Users, Heart } from "lucide-react"
 import { useState } from "react"
 import Image from "next/image"
 import Navbar from "../component/navbar"
@@ -213,13 +213,12 @@ export default function Konsultasi() {
       {[1, 2, 3].map((step) => (
         <div key={step} className="flex items-center">
           <motion.div
-            className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-              step === currentStep
+            className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${step === currentStep
                 ? "bg-[#1E498E] text-white shadow-lg"
                 : step < currentStep
                   ? "bg-[#B3E5FC] text-[#1E498E]"
                   : "bg-[#FFF3E0] text-gray-400"
-            }`}
+              }`}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -294,11 +293,10 @@ export default function Konsultasi() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setSelectedPayment(method)}
-                    className={`p-6 rounded-2xl border-2 transition-all ${
-                      selectedPayment === method
+                    className={`p-6 rounded-2xl border-2 transition-all ${selectedPayment === method
                         ? "border-[#1E498E] bg-[#B3E5FC]/30"
                         : "border-[#FFF3E0] bg-white hover:border-[#B3E5FC]"
-                    }`}
+                      }`}
                   >
                     <div className="text-center">
                       <div className="w-12 h-12 bg-[#1E498E] rounded-full mx-auto mb-2 flex items-center justify-center text-white font-bold">
@@ -315,11 +313,10 @@ export default function Konsultasi() {
                 whileTap={{ scale: 0.98 }}
                 onClick={handlePayment}
                 disabled={!selectedPayment || processingPayment}
-                className={`w-full py-4 rounded-2xl font-semibold text-lg transition-all ${
-                  processingPayment || !selectedPayment
+                className={`w-full py-4 rounded-2xl font-semibold text-lg transition-all ${processingPayment || !selectedPayment
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-[#1E498E] text-white hover:bg-[#1E498E]/90 shadow-lg"
-                }`}
+                  }`}
               >
                 {processingPayment ? (
                   <div className="flex items-center justify-center gap-2">
@@ -355,9 +352,8 @@ export default function Konsultasi() {
                 whileTap={{ scale: 0.98 }}
                 onClick={confirmPayment}
                 disabled={processingPayment}
-                className={`w-full py-4 rounded-2xl font-semibold text-lg ${
-                  processingPayment ? "bg-gray-300 text-gray-500" : "bg-[#B3E5FC] text-[#1E498E] hover:bg-[#B3E5FC]/80"
-                }`}
+                className={`w-full py-4 rounded-2xl font-semibold text-lg ${processingPayment ? "bg-gray-300 text-gray-500" : "bg-[#B3E5FC] text-[#1E498E] hover:bg-[#B3E5FC]/80"
+                  }`}
               >
                 {processingPayment ? (
                   <div className="flex items-center justify-center gap-2">
@@ -422,8 +418,9 @@ export default function Konsultasi() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#B3E5FC] via-[#FFF3E0] to-[#B3E5FC] relative overflow-hidden">
-        <Navbar/>
-      {/* Background decorations */}
+      <Navbar />
+
+      {/* Enhanced Background decorations */}
       <motion.div
         className="absolute top-20 left-10 w-32 h-32 bg-[#1E498E]/10 rounded-full blur-xl"
         variants={floatingVariants}
@@ -435,92 +432,174 @@ export default function Konsultasi() {
         animate="animate"
         transition={{ delay: 1 }}
       />
+      <motion.div
+        className="absolute top-1/2 left-1/2 w-64 h-64 bg-[#B3E5FC]/20 rounded-full blur-2xl -translate-x-1/2 -translate-y-1/2"
+        variants={floatingVariants}
+        animate="animate"
+        transition={{ delay: 2 }}
+      />
 
       <div className="pt-20 pb-10">
-        <motion.div className="container mx-auto px-4" variants={containerVariants} initial="hidden" animate="visible">
-          {/* Header */}
-          <motion.div className="text-center mb-12" variants={itemVariants}>
-            <h1 className="text-4xl md:text-5xl font-bold text-[#1E498E] mb-4">Konsultasi Kesehatan Mental</h1>
-            <p className="text-lg text-[#1E498E]/70 max-w-2xl mx-auto">
-              Dapatkan bantuan profesional dari psikiater terpercaya untuk kesehatan mental Anda
+        <motion.div className="container mx-auto px-4 max-w-7xl" variants={containerVariants} initial="hidden" animate="visible">
+
+          {/* Enhanced Header Section */}
+          <motion.div className="text-center mb-16" variants={itemVariants}>
+            <motion.div
+              className="inline-flex items-center gap-2 bg-white/60 backdrop-blur-sm px-6 py-3 rounded-full mb-6"
+              whileHover={{ scale: 1.05 }}
+            >
+              <Heart className="text-[#1E498E] w-5 h-5" />
+              <span className="text-[#1E498E] font-semibold">Kesehatan Mental Terpercaya</span>
+            </motion.div>
+
+            <h1 className="text-5xl md:text-6xl font-bold text-[#1E498E] mb-6 leading-tight">
+              Konsultasi dengan
+              <span className="block bg-gradient-to-r from-[#1E498E] to-[#1E498E]/70 bg-clip-text text-transparent">
+                Psikiater Profesional
+              </span>
+            </h1>
+
+            <p className="text-xl text-[#1E498E]/70 max-w-3xl mx-auto leading-relaxed">
+              Dapatkan bantuan profesional dari psikiater terpercaya untuk kesehatan mental Anda.
+              Konsultasi mudah, aman, dan terpercaya.
             </p>
+
           </motion.div>
 
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Doctor Selection */}
-            <motion.div className="lg:col-span-2 space-y-6" variants={itemVariants}>
-              <h2 className="text-2xl font-bold text-[#1E498E] mb-6">Pilih Dokter</h2>
+          {/* Main Content - New Layout */}
+          <div className="grid xl:grid-cols-5 gap-8">
 
-              <div className="grid md:grid-cols-2 gap-6">
+            {/* Left Column - Doctor Selection */}
+            <motion.div className="xl:col-span-3 space-y-8" variants={itemVariants}>
+
+              {/* Section Header */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-3xl font-bold text-[#1E498E] mb-2">Pilih Dokter Spesialis</h2>
+                  <p className="text-[#1E498E]/70">Konsultasi dengan psikiater berpengalaman</p>
+                </div>
+                <motion.div
+                  className="bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <span className="text-[#1E498E] font-semibold">{doctors.length} Dokter Tersedia</span>
+                </motion.div>
+              </div>
+
+              {/* Enhanced Doctor Cards */}
+              <div className="space-y-6">
                 {doctors.map((doctor, index) => (
                   <motion.div
                     key={doctor.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    whileHover={{ y: -5, scale: 1.02 }}
+                    initial={{ opacity: 0, x: -50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.2 }}
+                    whileHover={{ scale: 1.02, y: -5 }}
                     onClick={() => setSelectedDoctor(doctor)}
-                    className={`relative overflow-hidden rounded-3xl cursor-pointer transition-all duration-300 ${
-                      selectedDoctor?.id === doctor.id
-                        ? "ring-4 ring-[#1E498E] shadow-2xl"
-                        : "shadow-lg hover:shadow-xl"
-                    }`}
+                    className={`relative overflow-hidden rounded-3xl cursor-pointer transition-all duration-500 group ${selectedDoctor?.id === doctor.id
+                        ? "ring-4 ring-[#1E498E] shadow-2xl bg-gradient-to-r from-white to-[#B3E5FC]/40"
+                        : "shadow-lg hover:shadow-2xl bg-gradient-to-r from-white/90 to-white/60 backdrop-blur-sm"
+                      }`}
                   >
-                    <div className="bg-gradient-to-br from-white to-[#B3E5FC]/30 p-6 h-full">
-                      <div className="flex items-center gap-4 mb-4">
-                        <div className="w-16 h-16 rounded-full overflow-hidden bg-[#1E498E]/10">
-                          <Image
-                            src={doctor.image || "/placeholder.svg"}
-                            alt={doctor.name}
-                            width={64}
-                            height={64}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
+                    <div className="p-8">
+                      <div className="flex items-start gap-6">
+
+                        {/* Doctor Image */}
+                        <motion.div
+                          className="relative"
+                          whileHover={{ scale: 1.1 }}
+                        >
+                          <div className="w-24 h-24 rounded-2xl overflow-hidden bg-gradient-to-br from-[#B3E5FC] to-[#FFF3E0] p-1">
+                            <div className="w-full h-full rounded-xl overflow-hidden">
+                              <Image
+                                src={doctor.image || "/placeholder.svg"}
+                                alt={doctor.name}
+                                width={96}
+                                height={96}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          </div>
+                          {selectedDoctor?.id === doctor.id && (
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className="absolute -top-2 -right-2 w-8 h-8 bg-[#1E498E] rounded-full flex items-center justify-center"
+                            >
+                              <CheckCircle className="w-5 h-5 text-white" />
+                            </motion.div>
+                          )}
+                        </motion.div>
+
+                        {/* Doctor Info */}
                         <div className="flex-1">
-                          <h3 className="font-bold text-[#1E498E] text-lg">{doctor.name}</h3>
-                          <p className="text-[#1E498E]/70 text-sm">{doctor.specialty}</p>
-                          <div className="flex items-center gap-1 mt-1">
-                            <Star className="text-yellow-400 text-sm fill-current" />
-                            <span className="text-sm font-semibold text-[#1E498E]">{doctor.rating}</span>
+                          <div className="flex items-start justify-between mb-3">
+                            <div>
+                              <h3 className="text-2xl font-bold text-[#1E498E] mb-1">{doctor.name}</h3>
+                              <p className="text-[#1E498E]/70 font-medium">{doctor.specialty}</p>
+                            </div>
+                            <div className="flex items-center gap-2 bg-yellow-50 px-3 py-1 rounded-full">
+                              <Star className="text-yellow-400 w-4 h-4 fill-current" />
+                              <span className="font-bold text-[#1E498E]">{doctor.rating}</span>
+                            </div>
+                          </div>
+
+                          <p className="text-[#1E498E]/80 mb-4 leading-relaxed">{doctor.description}</p>
+
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2 text-[#1E498E]/60">
+                              <Clock className="w-4 h-4" />
+                              <span className="text-sm font-medium">{doctor.experience}</span>
+                            </div>
+
+                            <motion.button
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              className={`px-6 py-3 rounded-2xl font-semibold transition-all ${selectedDoctor?.id === doctor.id
+                                  ? "bg-[#1E498E] text-white shadow-lg"
+                                  : "bg-[#B3E5FC] text-[#1E498E] hover:bg-[#1E498E] hover:text-white"
+                                }`}
+                            >
+                              {selectedDoctor?.id === doctor.id ? "Terpilih" : "Pilih Dokter"}
+                            </motion.button>
                           </div>
                         </div>
-                      </div>
-
-                      <p className="text-[#1E498E]/80 text-sm mb-4 line-clamp-3">{doctor.description}</p>
-
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-[#1E498E]/60">{doctor.experience}</span>
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="bg-[#1E498E] text-white px-4 py-2 rounded-full text-sm font-semibold"
-                        >
-                          Pilih Dokter
-                        </motion.button>
                       </div>
                     </div>
                   </motion.div>
                 ))}
               </div>
 
-              {/* Promotional Banner */}
+              {/* Enhanced Promotional Banner */}
               <motion.div
                 variants={itemVariants}
-                className="bg-gradient-to-r from-[#1E498E] to-[#1E498E]/80 rounded-3xl p-8 text-white relative overflow-hidden"
+                className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#1E498E] via-[#1E498E]/90 to-[#1E498E]/80 p-8 text-white"
+                whileHover={{ scale: 1.02 }}
               >
                 <motion.div
-                  className="absolute -top-4 -right-4 w-24 h-24 bg-white/10 rounded-full"
+                  className="absolute -top-8 -right-8 w-32 h-32 bg-white/10 rounded-full"
                   animate={{ rotate: 360 }}
                   transition={{ duration: 20, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
                 />
-                <div className="relative z-10">
-                  <h3 className="text-2xl font-bold mb-2">Diskon Spesial!</h3>
-                  <p className="text-lg mb-4">Dapatkan diskon 50% untuk konsultasi pertama Anda</p>
+                <motion.div
+                  className="absolute -bottom-4 -left-4 w-24 h-24 bg-white/5 rounded-full"
+                  animate={{ rotate: -360 }}
+                  transition={{ duration: 15, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                />
+
+                <div className="relative z-10 flex items-center justify-between">
+                  <div>
+                    <h3 className="text-3xl font-bold mb-2">Promo Spesial!</h3>
+                    <p className="text-xl mb-4 opacity-90">Diskon 50% untuk konsultasi pertama</p>
+                    <div className="flex items-center gap-2 text-sm opacity-80">
+                      <Clock className="w-4 h-4" />
+                      <span>Berlaku hingga akhir bulan</span>
+                    </div>
+                  </div>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="bg-white text-[#1E498E] px-6 py-3 rounded-full font-semibold"
+                    className="bg-white text-[#1E498E] px-8 py-4 rounded-2xl font-bold text-lg shadow-lg"
                   >
                     Klaim Sekarang
                   </motion.button>
@@ -528,161 +607,184 @@ export default function Konsultasi() {
               </motion.div>
             </motion.div>
 
-            {/* Booking Panel */}
+            {/* Right Column - Enhanced Booking Panel */}
             <motion.div
               variants={itemVariants}
-              className="bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl h-fit sticky top-24"
+              className="xl:col-span-2 space-y-6"
             >
-              {/* Doctor Header */}
-              <div className="flex items-center gap-3 mb-6 p-4 bg-[#B3E5FC]/30 rounded-2xl">
-                <Stethoscope className="text-[#1E498E] text-xl" />
-                <div>
+              <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-8 shadow-2xl sticky top-24">
+
+                {/* Panel Header */}
+                <div className="text-center mb-8">
+                  <div className="w-16 h-16 bg-gradient-to-br from-[#B3E5FC] to-[#FFF3E0] rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Stethoscope className="text-[#1E498E] w-8 h-8" />
+                  </div>
                   {selectedDoctor ? (
                     <>
-                      <h3 className="font-bold text-[#1E498E]">{selectedDoctor.name}</h3>
-                      <p className="text-[#1E498E]/70 text-sm">Jadwal Konsultasi</p>
+                      <h3 className="text-2xl font-bold text-[#1E498E] mb-2">{selectedDoctor.name}</h3>
+                      <p className="text-[#1E498E]/70">Atur Jadwal Konsultasi</p>
                     </>
                   ) : (
                     <>
-                      <h3 className="font-bold text-[#1E498E]">Pilih Dokter</h3>
-                      <p className="text-[#1E498E]/70 text-sm">Silakan pilih dokter terlebih dahulu</p>
+                      <h3 className="text-2xl font-bold text-[#1E498E] mb-2">Pilih Dokter</h3>
+                      <p className="text-[#1E498E]/70">Silakan pilih dokter terlebih dahulu</p>
                     </>
                   )}
                 </div>
-              </div>
 
-              {selectedDoctor && (
-                <>
-                  {/* Calendar */}
-                  <div className="mb-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <h4 className="text-lg font-bold text-[#1E498E]">
-                        {formatDate(currentMonth).month} {currentMonth.getFullYear()}
-                      </h4>
-                      <div className="flex gap-2">
-                        <motion.button
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          onClick={() => navigateMonth(-1)}
-                          className="p-2 rounded-full bg-[#B3E5FC] text-[#1E498E] hover:bg-[#B3E5FC]/80"
-                        >
-                          <ChevronLeft />
-                        </motion.button>
-                        <motion.button
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          onClick={() => navigateMonth(1)}
-                          className="p-2 rounded-full bg-[#B3E5FC] text-[#1E498E] hover:bg-[#B3E5FC]/80"
-                        >
-                          <ChevronRight />
-                        </motion.button>
-                      </div>
-                    </div>
-
-                    {/* Calendar Grid */}
-                    <div className="grid grid-cols-7 gap-1 mb-4">
-                      {["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"].map((day) => (
-                        <div key={day} className="text-center text-xs font-medium text-[#1E498E]/70 py-2">
-                          {day}
-                        </div>
-                      ))}
-                      {getDaysInMonth(currentMonth).map(({ date, isCurrentMonth }, index) => {
-                        const isSelected =
-                          selectedDate &&
-                          date.getDate() === selectedDate.getDate() &&
-                          date.getMonth() === selectedDate.getMonth()
-
-                        return (
+                {selectedDoctor && (
+                  <>
+                    {/* Enhanced Calendar */}
+                    <div className="mb-8">
+                      <div className="flex items-center justify-between mb-6">
+                        <h4 className="text-xl font-bold text-[#1E498E]">
+                          {formatDate(currentMonth).month} {currentMonth.getFullYear()}
+                        </h4>
+                        <div className="flex gap-2">
                           <motion.button
-                            key={`date-${index}`}
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.2, delay: index * 0.01 }}
-                            whileHover={isCurrentMonth ? { scale: 1.1 } : {}}
-                            whileTap={isCurrentMonth ? { scale: 0.95 } : {}}
-                            onClick={() => isCurrentMonth && setSelectedDate(date)}
-                            disabled={!isCurrentMonth}
-                            className={`
-                              p-2 text-sm rounded-lg transition-all
-                              ${
-                                isCurrentMonth
-                                  ? "hover:bg-[#B3E5FC] text-[#1E498E]"
-                                  : "opacity-30 cursor-not-allowed text-gray-400"
-                              }
-                              ${isSelected ? "bg-[#1E498E] text-white" : ""}
-                              ${isToday(date) && !isSelected ? "ring-2 ring-[#1E498E]" : ""}
-                            `}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => navigateMonth(-1)}
+                            className="p-3 rounded-xl bg-[#B3E5FC] text-[#1E498E] hover:bg-[#1E498E] hover:text-white transition-colors"
                           >
-                            {date.getDate()}
+                            <ChevronLeft className="w-5 h-5" />
                           </motion.button>
-                        )
-                      })}
-                    </div>
-                  </div>
+                          <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => navigateMonth(1)}
+                            className="p-3 rounded-xl bg-[#B3E5FC] text-[#1E498E] hover:bg-[#1E498E] hover:text-white transition-colors"
+                          >
+                            <ChevronRight className="w-5 h-5" />
+                          </motion.button>
+                        </div>
+                      </div>
 
-                  {/* Time Slots */}
-                  {selectedDate && (
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
-                      <h4 className="font-semibold text-[#1E498E] mb-4">Pilih Waktu:</h4>
-                      <div className="space-y-3">
-                        {selectedDoctor.schedules.map((slot, index) => {
-                          const isBooked = bookedSlots[slot.time]?.isBooked
-                          const isSelected = selectedTimes.includes(slot.time)
+                      {/* Calendar Grid */}
+                      <div className="bg-gradient-to-br from-[#FFF3E0]/30 to-[#B3E5FC]/30 p-4 rounded-2xl">
+                        <div className="grid grid-cols-7 gap-2 mb-4">
+                          {["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"].map((day) => (
+                            <div key={day} className="text-center text-sm font-bold text-[#1E498E]/70 py-3">
+                              {day}
+                            </div>
+                          ))}
+                          {getDaysInMonth(currentMonth).map(({ date, isCurrentMonth }, index) => {
+                            const isSelected =
+                              selectedDate &&
+                              date.getDate() === selectedDate.getDate() &&
+                              date.getMonth() === selectedDate.getMonth()
 
-                          return (
-                            <motion.div
-                              key={index}
-                              initial={{ opacity: 0, x: -20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: index * 0.1 }}
-                              className="flex items-center justify-between p-3 bg-[#FFF3E0]/50 rounded-xl"
-                            >
-                              <div>
-                                <p className="font-medium text-[#1E498E]">{slot.session}</p>
-                                <p className="text-sm text-[#1E498E]/70">{slot.time}</p>
-                              </div>
+                            return (
                               <motion.button
-                                whileHover={!isBooked ? { scale: 1.05 } : {}}
-                                whileTap={!isBooked ? { scale: 0.95 } : {}}
-                                onClick={() => handleTimeSelection(slot.time)}
-                                disabled={isBooked}
+                                key={`date-${index}`}
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.2, delay: index * 0.01 }}
+                                whileHover={isCurrentMonth ? { scale: 1.1 } : {}}
+                                whileTap={isCurrentMonth ? { scale: 0.95 } : {}}
+                                onClick={() => isCurrentMonth && setSelectedDate(date)}
+                                disabled={!isCurrentMonth}
                                 className={`
-                                  px-4 py-2 rounded-full text-sm font-medium transition-all
-                                  ${
-                                    isBooked
-                                      ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                                      : isSelected
-                                        ? "bg-[#1E498E] text-white"
-                                        : "bg-[#B3E5FC] text-[#1E498E] hover:bg-[#B3E5FC]/80"
+                                  p-3 text-sm rounded-xl transition-all font-medium
+                                  ${isCurrentMonth
+                                    ? "hover:bg-[#B3E5FC] text-[#1E498E] cursor-pointer"
+                                    : "opacity-30 cursor-not-allowed text-gray-400"
                                   }
+                                  ${isSelected ? "bg-[#1E498E] text-white shadow-lg" : ""}
+                                  ${isToday(date) && !isSelected ? "ring-2 ring-[#1E498E] bg-white" : ""}
                                 `}
                               >
-                                {isBooked ? "Terpesan" : isSelected ? "Terpilih" : "Pilih"}
+                                {date.getDate()}
                               </motion.button>
-                            </motion.div>
-                          )
-                        })}
+                            )
+                          })}
+                        </div>
                       </div>
-                    </motion.div>
-                  )}
+                    </div>
 
-                  {/* Payment Section */}
-                  {selectedDate && selectedTimes.length > 0 ? (
-                    <PaymentSection />
-                  ) : (
-                    <motion.div
-                      className="text-center p-6 bg-[#FFF3E0]/50 rounded-2xl"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                    >
-                      <Calendar className="text-[#1E498E]/50 text-3xl mx-auto mb-3" />
-                      <p className="text-[#1E498E]/70">
-                        {!selectedDate ? "Silakan pilih tanggal konsultasi" : "Silakan pilih waktu konsultasi"}
-                      </p>
-                    </motion.div>
-                  )}
-                </>
-              )}
+                    {/* Enhanced Time Slots */}
+                    {selectedDate && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mb-8"
+                      >
+                        <h4 className="text-xl font-bold text-[#1E498E] mb-6">Pilih Waktu Konsultasi</h4>
+                        <div className="space-y-4">
+                          {selectedDoctor.schedules.map((slot, index) => {
+                            const isBooked = bookedSlots[slot.time]?.isBooked
+                            const isSelected = selectedTimes.includes(slot.time)
+
+                            return (
+                              <motion.div
+                                key={index}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: index * 0.1 }}
+                                className={`flex items-center justify-between p-4 rounded-2xl transition-all ${isSelected
+                                    ? "bg-gradient-to-r from-[#1E498E] to-[#1E498E]/80 text-white"
+                                    : "bg-gradient-to-r from-[#FFF3E0]/50 to-[#B3E5FC]/30"
+                                  }`}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className={`w-3 h-3 rounded-full ${isSelected ? "bg-white" : "bg-[#1E498E]"}`} />
+                                  <div>
+                                    <p className={`font-bold ${isSelected ? "text-white" : "text-[#1E498E]"}`}>
+                                      {slot.session}
+                                    </p>
+                                    <p className={`text-sm ${isSelected ? "text-white/80" : "text-[#1E498E]/70"}`}>
+                                      {slot.time}
+                                    </p>
+                                  </div>
+                                </div>
+                                <motion.button
+                                  whileHover={!isBooked ? { scale: 1.05 } : {}}
+                                  whileTap={!isBooked ? { scale: 0.95 } : {}}
+                                  onClick={() => handleTimeSelection(slot.time)}
+                                  disabled={isBooked}
+                                  className={`
+                                    px-6 py-3 rounded-xl font-bold transition-all
+                                    ${isBooked
+                                      ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                                      : isSelected
+                                        ? "bg-white text-[#1E498E] shadow-lg"
+                                        : "bg-[#1E498E] text-white hover:bg-[#1E498E]/80"
+                                    }
+                                  `}
+                                >
+                                  {isBooked ? "Terpesan" : isSelected ? "Terpilih" : "Pilih"}
+                                </motion.button>
+                              </motion.div>
+                            )
+                          })}
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* Payment Section or Empty State */}
+                    {selectedDate && selectedTimes.length > 0 ? (
+                      <PaymentSection />
+                    ) : (
+                      <motion.div
+                        className="text-center p-8 bg-gradient-to-br from-[#FFF3E0]/50 to-[#B3E5FC]/30 rounded-2xl"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                      >
+                        <Calendar className="text-[#1E498E]/50 w-12 h-12 mx-auto mb-4" />
+                        <h4 className="text-lg font-bold text-[#1E498E] mb-2">
+                          {!selectedDate ? "Pilih Tanggal" : "Pilih Waktu"}
+                        </h4>
+                        <p className="text-[#1E498E]/70">
+                          {!selectedDate
+                            ? "Silakan pilih tanggal konsultasi yang diinginkan"
+                            : "Silakan pilih waktu konsultasi yang tersedia"
+                          }
+                        </p>
+                      </motion.div>
+                    )}
+                  </>
+                )}
+              </div>
             </motion.div>
           </div>
         </motion.div>
