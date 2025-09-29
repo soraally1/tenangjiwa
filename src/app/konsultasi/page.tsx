@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from "framer-motion"
 import { ChevronLeft, ChevronRight, CheckCircle, Calendar, Stethoscope, Star, Clock, Award, Users, Heart } from "lucide-react"
 import { useState } from "react"
 import Image from "next/image"
+import Script from "next/script"
+import { getCurrentUser } from "@/app/service/loginservice"
 import Navbar from "../component/navbar"
 // Types
 interface Doctor {
@@ -229,11 +231,64 @@ export default function Konsultasi() {
     const totalPayment = CONSULTATION_PRICE * selectedTimes.length
 
     const handlePayment = async () => {
-      setProcessingPayment(true)
-      setTimeout(() => {
+      try {
+        setProcessingPayment(true)
+
+        // Get current user info from Firebase Auth
+        const user = getCurrentUser()
+        if (!user) {
+          setProcessingPayment(false)
+          alert('Silakan login untuk melanjutkan pembayaran')
+          return
+        }
+
+        const userId = user.uid
+        const userEmail = user.email || 'user@example.com'
+        const userName = user.displayName || 'Pengguna'
+
+        const res = await fetch('/api/midtrans/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId,
+            userEmail,
+            userName,
+            doctorId: selectedDoctor?.id,
+            doctorName: selectedDoctor?.name,
+            selectedDate: selectedDate?.toISOString(),
+            selectedTimes,
+            amount: totalPayment,
+          })
+        })
+        const data = await res.json()
+        if (!res.ok) throw new Error(data?.error || 'Gagal membuat transaksi')
+
+        const snapToken: string = data.token as string
+        // const orderId: string = data.orderId as string
+
+        const w = window as unknown as { snap?: { pay: (token: string, opts: Record<string, unknown>) => void } }
+        if (!w.snap) {
+          throw new Error('Midtrans Snap belum siap')
+        }
+
+        w.snap.pay(snapToken, {
+          onSuccess: function () {
+            setPaymentStep(3)
+          },
+          onPending: function () {
+            setPaymentStep(2)
+          },
+          onError: function () {
+            setProcessingPayment(false)
+          },
+          onClose: function () {
+            setProcessingPayment(false)
+          }
+        })
+      } catch (e) {
+        console.error(e)
         setProcessingPayment(false)
-        setPaymentStep(2)
-      }, 2000)
+      }
     }
 
     const confirmPayment = async () => {
@@ -401,6 +456,7 @@ export default function Konsultasi() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#B3E5FC] via-[#FFF3E0] to-[#B3E5FC] relative overflow-hidden">
+      <Script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY as string} strategy="afterInteractive" />
       <Navbar />
 
       {/* Enhanced Background decorations */}

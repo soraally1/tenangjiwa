@@ -1,7 +1,8 @@
 "use client"
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
+import { useMentalHealthDetection } from '@/app/hooks/useMentalHealthDetection';
 import {
   Camera,
   Smile,
@@ -23,14 +24,6 @@ import {
 } from 'lucide-react';
 import Navbar from '@/app/component/navbar';
 
-interface EmotionData {
-  emotion: string;
-  confidence: number;
-  icon: React.ReactNode;
-  color: string;
-  bgGradient: string;
-}
-
 interface ChatMessage {
   id: string;
   text: string;
@@ -40,9 +33,6 @@ interface ChatMessage {
 }
 
 export default function AIEmotionScanner() {
-  const [isScanning, setIsScanning] = useState(false);
-  const [currentEmotion, setCurrentEmotion] = useState<EmotionData | null>(null);
-  const [emotionHistory, setEmotionHistory] = useState<EmotionData[]>([]);
   const [story, setStory] = useState("");
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState("");
@@ -52,49 +42,41 @@ export default function AIEmotionScanner() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
+  // Use mental health detection hook
+  const {
+    isModelLoaded,
+    faceDetected,
+    currentEmotion,
+    emotionHistory,
+    isDetecting,
+    mentalHealthAssessment,
+    eyeTrackingData,
+    behavioralData,
+    startDetection,
+    stopDetection,
+    clearHistory,
+    canvasRef
+  } = useMentalHealthDetection();
+
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  const emotions: EmotionData[] = useMemo(() => [
-    {
-      emotion: "Bahagia",
-      confidence: 0.85,
-      icon: <Smile className="w-5 h-5" />,
-      color: "bg-green-500",
-      bgGradient: "from-green-400/20 to-green-600/20"
-    },
-    {
-      emotion: "Sedih",
-      confidence: 0.72,
-      icon: <Frown className="w-5 h-5" />,
-      color: "bg-blue-500",
-      bgGradient: "from-blue-400/20 to-blue-600/20"
-    },
-    {
-      emotion: "Netral",
-      confidence: 0.65,
-      icon: <Meh className="w-5 h-5" />,
-      color: "bg-gray-500",
-      bgGradient: "from-gray-400/20 to-gray-600/20"
-    },
-    {
-      emotion: "Cinta",
-      confidence: 0.78,
-      icon: <Heart className="w-5 h-5" />,
-      color: "bg-pink-500",
-      bgGradient: "from-pink-400/20 to-pink-600/20"
-    },
-    {
-      emotion: "Stres",
-      confidence: 0.68,
-      icon: <Zap className="w-5 h-5" />,
-      color: "bg-red-500",
-      bgGradient: "from-red-400/20 to-red-600/20"
-    },
-  ], []);
+  // Helper function to get emotion icon
+  const getEmotionIcon = (emotion: string) => {
+    const iconMap = {
+      'Bahagia': <Smile className="w-5 h-5" />,
+      'Sedih': <Frown className="w-5 h-5" />,
+      'Marah': <Zap className="w-5 h-5" />,
+      'Takut': <Frown className="w-5 h-5" />,
+      'Jijik': <Meh className="w-5 h-5" />,
+      'Terkejut': <Heart className="w-5 h-5" />,
+      'Netral': <Meh className="w-5 h-5" />,
+    };
+    return iconMap[emotion as keyof typeof iconMap] || <Meh className="w-5 h-5" />;
+  };
 
-  const getAIResponse = (userMessage: string, currentEmotion?: EmotionData): string => {
+  const getAIResponse = (userMessage: string, currentEmotion?: { emotion: string; confidence: number }): string => {
     const emotionResponses = {
       Bahagia: [
         "Senang melihat Anda bahagia! Ceritakan lebih lanjut tentang apa yang membuat Anda gembira.",
@@ -106,20 +88,30 @@ export default function AIEmotionScanner() {
         "Terkadang berbagi perasaan bisa membantu. Apa yang sedang mengganggu pikiran Anda?",
         "Ingatlah bahwa perasaan sedih adalah bagian normal dari hidup. Ceritakan pada saya.",
       ],
+      Marah: [
+        "Saya mendeteksi kemarahan. Mari kita bicarakan apa yang membuat Anda marah.",
+        "Kemarahan adalah perasaan yang valid. Ceritakan apa yang terjadi.",
+        "Saya di sini untuk mendengarkan. Apa yang sedang mengganggu Anda?",
+      ],
+      Takut: [
+        "Saya melihat ketakutan di mata Anda. Saya di sini untuk membantu Anda merasa aman.",
+        "Takut adalah perasaan yang normal. Ceritakan apa yang membuat Anda takut.",
+        "Mari kita bicarakan ketakutan Anda bersama-sama.",
+      ],
+      Jijik: [
+        "Saya mendeteksi perasaan jijik. Apa yang membuat Anda merasa seperti ini?",
+        "Perasaan jijik bisa menjadi sinyal penting. Ceritakan pada saya.",
+        "Saya di sini untuk mendengarkan perasaan Anda.",
+      ],
+      Terkejut: [
+        "Anda terlihat terkejut! Apa yang baru saja terjadi?",
+        "Kejutan bisa membawa berbagai perasaan. Ceritakan pada saya.",
+        "Saya penasaran dengan apa yang membuat Anda terkejut.",
+      ],
       Netral: [
         "Anda terlihat tenang dan seimbang. Bagaimana perasaan Anda hari ini?",
         "Saya melihat ketenangan dalam ekspresi Anda. Ada yang ingin Anda ceritakan?",
         "Kondisi emosi yang stabil menunjukkan kedewasaan. Mari berbincang!",
-      ],
-      Cinta: [
-        "Ada kehangatan yang terpancar dari Anda! Sedang memikirkan seseorang yang spesial?",
-        "Perasaan cinta membuat hidup lebih bermakna. Ceritakan tentang hal yang Anda cintai.",
-        "Saya merasakan energi kasih sayang dari Anda. Apa yang membuat hati Anda hangat?",
-      ],
-      Stres: [
-        "Saya mendeteksi tanda-tanda stres. Mari kita bicarakan apa yang sedang membebani Anda.",
-        "Bernapas dalam-dalam dulu. Saya di sini untuk membantu Anda merasa lebih baik.",
-        "Stres adalah sinyal bahwa Anda perlu istirahat. Ceritakan apa yang terjadi.",
       ],
     };
 
@@ -132,7 +124,7 @@ export default function AIEmotionScanner() {
 
     if (currentEmotion) {
       const responses = emotionResponses[currentEmotion.emotion as keyof typeof emotionResponses];
-      return responses[Math.floor(Math.random() * responses.length)];
+      return responses ? responses[Math.floor(Math.random() * responses.length)] : generalResponses[Math.floor(Math.random() * generalResponses.length)];
     }
 
     return generalResponses[Math.floor(Math.random() * generalResponses.length)];
@@ -170,17 +162,24 @@ export default function AIEmotionScanner() {
   }, [chatMessages, isTyping]);
 
   const startCamera = async () => {
+    if (!isModelLoaded) {
+      alert("Model AI sedang dimuat, silakan tunggu sebentar...");
+      return;
+    }
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { width: 640, height: 480 },
       });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        setIsScanning(true);
         setScanDuration(0);
+        // Start face detection
+        await startDetection(videoRef.current);
       }
     } catch (error) {
       console.error("Error accessing camera:", error);
+      alert("Tidak dapat mengakses kamera. Pastikan izin kamera telah diberikan.");
     }
   };
 
@@ -190,50 +189,48 @@ export default function AIEmotionScanner() {
       tracks.forEach((track) => track.stop());
       videoRef.current.srcObject = null;
     }
-    setIsScanning(false);
+    stopDetection();
   };
 
   const resetAnalysis = () => {
-    setCurrentEmotion(null);
-    setEmotionHistory([]);
+    clearHistory();
     setStory("");
     setChatMessages([]);
     setScanDuration(0);
   };
 
-  // Scanning effect and emotion detection
+  // Update story based on detected emotion
   useEffect(() => {
-    if (!isScanning) return;
+    if (!currentEmotion) {
+      setStory("");
+      return;
+    }
+
+    const stories = {
+      Bahagia: "Saya melihat kebahagiaan yang terpancar dari mata Anda! Energi positif ini menunjukkan bahwa Anda sedang dalam suasana hati yang baik.",
+      Sedih: "Sepertinya ada kesedihan yang Anda rasakan. Ingatlah bahwa perasaan ini normal dan akan berlalu.",
+      Marah: "Saya mendeteksi kemarahan dalam ekspresi Anda. Mari kita bicarakan apa yang membuat Anda marah.",
+      Takut: "Saya melihat ketakutan di mata Anda. Saya di sini untuk membantu Anda merasa aman.",
+      Jijik: "Saya mendeteksi perasaan jijik. Mari kita bicarakan apa yang membuat Anda merasa seperti ini.",
+      Terkejut: "Anda terlihat terkejut! Apa yang baru saja terjadi?",
+      Netral: "Anda terlihat tenang dan seimbang. Kondisi emosi yang stabil ini menunjukkan kedewasaan emosional.",
+    };
+
+    setStory(stories[currentEmotion.emotion as keyof typeof stories] || "Sedang menganalisis emosi Anda...");
+  }, [currentEmotion]);
+
+  // Update scan duration when detecting
+  useEffect(() => {
+    if (!isDetecting) return;
 
     const durationInterval = setInterval(() => {
       setScanDuration(prev => prev + 1);
     }, 1000);
 
-    const interval = setInterval(() => {
-      const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-      setCurrentEmotion(randomEmotion);
-
-      setEmotionHistory((prev) => {
-        const newHistory = [...prev, randomEmotion];
-        return newHistory.slice(-10);
-      });
-
-      const stories = {
-        Bahagia: "Saya melihat kebahagiaan yang terpancar dari mata Anda! Energi positif ini menunjukkan bahwa Anda sedang dalam suasana hati yang baik.",
-        Sedih: "Sepertinya ada kesedihan yang Anda rasakan. Ingatlah bahwa perasaan ini normal dan akan berlalu.",
-        Netral: "Anda terlihat tenang dan seimbang. Kondisi emosi yang stabil ini menunjukkan kedewasaan emosional.",
-        Cinta: "Ada kehangatan dan kasih sayang yang terpancar dari ekspresi Anda. Perasaan cinta membuat hidup lebih bermakna.",
-        Stres: "Saya mendeteksi tanda-tanda stres. Cobalah untuk bernapas dalam-dalam dan rileks sejenak.",
-      };
-
-      setStory(stories[randomEmotion.emotion as keyof typeof stories] || "Sedang menganalisis emosi Anda...");
-    }, 2000);
-
     return () => {
-      clearInterval(interval);
       clearInterval(durationInterval);
     };
-  }, [isScanning, emotions]);
+  }, [isDetecting]);
 
   const FloatingElements = () => (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -299,9 +296,9 @@ export default function AIEmotionScanner() {
                         <Eye className="w-6 h-6" />
                         Live Camera Feed
                       </h3>
-                      {isScanning && (
+                      {isDetecting && (
                         <div className="flex items-center gap-2 text-[#1E498E]/70">
-                          <Clock className="w-8 h-8" />
+                          <Clock className="w-4 h-4" />
                           <span className="text-sm">{Math.floor(scanDuration / 60)}:{(scanDuration % 60).toString().padStart(2, '0')}</span>
                         </div>
                       )}
@@ -317,10 +314,15 @@ export default function AIEmotionScanner() {
                         muted
                         className="w-full h-full object-cover"
                       />
+                      <canvas
+                        ref={canvasRef}
+                        className="absolute inset-0 w-full h-full pointer-events-none"
+                        style={{ zIndex: 10 }}
+                      />
 
                       {/* Scanning Animation */}
                       <AnimatePresence>
-                        {isScanning && (
+                        {isDetecting && (
                           <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -357,10 +359,10 @@ export default function AIEmotionScanner() {
                           >
                             <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-white/40">
                               <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                  <div className={`w-12 h-12 ${currentEmotion.color} rounded-full flex items-center justify-center text-white shadow-lg`}>
-                                    {currentEmotion.icon}
-                                  </div>
+                                  <div className="flex items-center gap-3">
+                                    <div className={`w-12 h-12 ${currentEmotion.color} rounded-full flex items-center justify-center text-white shadow-lg`}>
+                                      {getEmotionIcon(currentEmotion.emotion)}
+                                    </div>
                                   <div>
                                     <h4 className="font-semibold text-[#1E498E]">{currentEmotion.emotion}</h4>
                                     <p className="text-[#1E498E]/70 text-sm">Confidence: {Math.round(currentEmotion.confidence * 100)}%</p>
@@ -383,28 +385,39 @@ export default function AIEmotionScanner() {
                       </AnimatePresence>
 
                       {/* No camera placeholder */}
-                      {!isScanning && (
+                      {!isDetecting && (
                         <div className="absolute inset-0 flex items-center justify-center">
                           <div className="text-center text-white/70">
                             <Camera className="w-16 h-16 mx-auto mb-4 opacity-50" />
                             <p className="text-lg mb-2">Kamera tidak aktif</p>
                             <p className="text-sm">Klik tombol &quot;Mulai Scan&quot; untuk memulai</p>
+                            {!isModelLoaded && (
+                              <div className="mt-4">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white/50 mx-auto mb-2"></div>
+                                <p className="text-xs">Memuat model AI...</p>
+                              </div>
+                            )}
                           </div>
                         </div>
                       )}
                     </div>
 
                     {/* Controls */}
-                    <div className="flex flex-wrap gap-3 mt-25">
-                      {!isScanning ? (
+                    <div className="flex flex-wrap gap-3 mt-6">
+                      {!isDetecting ? (
                         <motion.button
                           onClick={startCamera}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="bg-[#1E498E] hover:bg-[#1E498E]/90 text-white px-6 py-3 rounded-xl font-medium flex items-center gap-2 transition-colors shadow-lg"
+                          disabled={!isModelLoaded}
+                          whileHover={{ scale: isModelLoaded ? 1.05 : 1 }}
+                          whileTap={{ scale: isModelLoaded ? 0.95 : 1 }}
+                          className={`px-6 py-3 rounded-xl font-medium flex items-center gap-2 transition-colors shadow-lg ${
+                            isModelLoaded 
+                              ? "bg-[#1E498E] hover:bg-[#1E498E]/90 text-white" 
+                              : "bg-gray-400 text-gray-200 cursor-not-allowed"
+                          }`}
                         >
-                          <Play className="w-5 h-5" />
-                          Mulai Scan
+                          {isModelLoaded ? <Play className="w-5 h-5" /> : <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>}
+                          {isModelLoaded ? "Mulai Scan" : "Memuat Model..."}
                         </motion.button>
                       ) : (
                         <motion.button
@@ -589,6 +602,21 @@ export default function AIEmotionScanner() {
                 Analisis Real-time
               </h3>
 
+              {/* Face Detection Status */}
+              {isDetecting && (
+                <div className="mb-4 p-3 bg-white/30 rounded-xl">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-[#1E498E]/70">Deteksi Wajah:</span>
+                    <div className="flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full ${faceDetected ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`}></div>
+                      <span className="text-xs text-[#1E498E] font-medium">
+                        {faceDetected ? 'Wajah Terdeteksi' : 'Mencari Wajah...'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <AnimatePresence mode="wait">
                 {story ? (
                   <motion.div
@@ -603,7 +631,7 @@ export default function AIEmotionScanner() {
                       <div className="mt-3 flex items-center gap-2">
                         <span className="text-xs text-[#1E498E]/70">Status:</span>
                         <span className={`${currentEmotion.color} text-white px-3 py-1 text-xs rounded-full flex items-center gap-1`}>
-                          {currentEmotion.icon}
+                          {getEmotionIcon(currentEmotion.emotion)}
                           {currentEmotion.emotion}
                         </span>
                       </div>
@@ -618,6 +646,181 @@ export default function AIEmotionScanner() {
                 )}
               </AnimatePresence>
             </div>
+
+            {/* Mental Health Analysis */}
+            {mentalHealthAssessment && (
+              <div className="bg-white/20 backdrop-blur-xl rounded-3xl border border-white/30 shadow-2xl p-6">
+                <h3 className="text-[#1E498E] font-semibold text-xl mb-4 flex items-center gap-3">
+                  <Brain className="w-6 h-6" />
+                  Analisis Kesehatan Mental
+                </h3>
+
+                <div className="space-y-4">
+                  {/* Risk Level */}
+                  <div className="p-4 bg-white/30 rounded-xl">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-[#1E498E]">Tingkat Risiko</span>
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                        mentalHealthAssessment.overallRisk === 'critical' ? 'bg-red-100 text-red-800' :
+                        mentalHealthAssessment.overallRisk === 'high' ? 'bg-orange-100 text-orange-800' :
+                        mentalHealthAssessment.overallRisk === 'moderate' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-green-100 text-green-800'
+                      }`}>
+                        {mentalHealthAssessment.overallRisk === 'critical' ? 'KRITIS' :
+                         mentalHealthAssessment.overallRisk === 'high' ? 'TINGGI' :
+                         mentalHealthAssessment.overallRisk === 'moderate' ? 'SEDANG' : 'RENDAH'}
+                      </span>
+                    </div>
+                    <div className="text-xs text-[#1E498E]/70">
+                      Confidence: {Math.round(mentalHealthAssessment.confidence * 100)}%
+                    </div>
+                  </div>
+
+                  {/* Mental Health Scores */}
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-[#1E498E]">Depresi</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-20 h-2 bg-gray-200 rounded-full">
+                          <div 
+                            className="h-2 bg-red-500 rounded-full transition-all duration-500"
+                            style={{ width: `${mentalHealthAssessment.indicators.depressionScore}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-[#1E498E]/70 w-8">
+                          {Math.round(mentalHealthAssessment.indicators.depressionScore)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-[#1E498E]">Kecemasan</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-20 h-2 bg-gray-200 rounded-full">
+                          <div 
+                            className="h-2 bg-orange-500 rounded-full transition-all duration-500"
+                            style={{ width: `${mentalHealthAssessment.indicators.anxietyScore}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-[#1E498E]/70 w-8">
+                          {Math.round(mentalHealthAssessment.indicators.anxietyScore)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-[#1E498E]">Stres</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-20 h-2 bg-gray-200 rounded-full">
+                          <div 
+                            className="h-2 bg-yellow-500 rounded-full transition-all duration-500"
+                            style={{ width: `${mentalHealthAssessment.indicators.stressLevel}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-[#1E498E]/70 w-8">
+                          {Math.round(mentalHealthAssessment.indicators.stressLevel)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Professional Help Alert */}
+                  {mentalHealthAssessment.professionalHelpNeeded && (
+                    <div className="p-3 bg-red-100 border border-red-300 rounded-xl">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                        <span className="text-sm font-medium text-red-800">
+                          Disarankan konsultasi profesional
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Recommendations */}
+                  {mentalHealthAssessment.recommendations.length > 0 && (
+                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl">
+                      <h4 className="text-sm font-medium text-blue-800 mb-2">Rekomendasi:</h4>
+                      <ul className="space-y-1">
+                        {mentalHealthAssessment.recommendations.slice(0, 3).map((recommendation, index) => (
+                          <li key={index} className="text-xs text-blue-700 flex items-start gap-2">
+                            <span className="text-blue-500 mt-1">•</span>
+                            <span>{recommendation}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Eye Tracking Data */}
+            {eyeTrackingData && (
+              <div className="bg-white/20 backdrop-blur-xl rounded-3xl border border-white/30 shadow-2xl p-6">
+                <h3 className="text-[#1E498E] font-semibold text-xl mb-4 flex items-center gap-3">
+                  <Eye className="w-6 h-6" />
+                  Analisis Mata
+                </h3>
+
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-[#1E498E]">Kontak Mata</span>
+                    <span className="text-sm font-medium text-[#1E498E]">
+                      {Math.round(eyeTrackingData.eyeContactDuration * 100)}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-[#1E498E]">Frekuensi Kedipan</span>
+                    <span className="text-sm font-medium text-[#1E498E]">
+                      {Math.round(eyeTrackingData.blinkRate)}/menit
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-[#1E498E]">Stabilitas Pandangan</span>
+                    <span className="text-sm font-medium text-[#1E498E]">
+                      {Math.round(eyeTrackingData.gazeStability * 100)}%
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Behavioral Analysis */}
+            {behavioralData && (
+              <div className="bg-white/20 backdrop-blur-xl rounded-3xl border border-white/30 shadow-2xl p-6">
+                <h3 className="text-[#1E498E] font-semibold text-xl mb-4 flex items-center gap-3">
+                  <Activity className="w-6 h-6" />
+                  Analisis Perilaku
+                </h3>
+
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-[#1E498E]">Frekuensi Senyum</span>
+                    <span className="text-sm font-medium text-[#1E498E]">
+                      {Math.round(behavioralData.smileFrequency * 10)}/menit
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-[#1E498E]">Gerakan Kepala</span>
+                    <span className="text-sm font-medium text-[#1E498E]">
+                      {Math.round(behavioralData.headMovement * 100)}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-[#1E498E]">Keterlibatan Sosial</span>
+                    <span className="text-sm font-medium text-[#1E498E]">
+                      {Math.round(behavioralData.socialEngagement * 100)}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-[#1E498E]">Tingkat Energi</span>
+                    <span className="text-sm font-medium text-[#1E498E]">
+                      {Math.round(behavioralData.energyLevel * 100)}%
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Emotion History */}
             <div className="bg-white/20 backdrop-blur-xl rounded-3xl border border-white/30 shadow-2xl p-6">
@@ -636,7 +839,7 @@ export default function AIEmotionScanner() {
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-8 h-8 ${emotion.color} rounded-full flex items-center justify-center text-white text-sm`}>
-                        {emotion.icon}
+                        {getEmotionIcon(emotion.emotion)}
                       </div>
                       <span className="text-[#1E498E] font-medium">{emotion.emotion}</span>
                     </div>

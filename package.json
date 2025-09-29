@@ -9,7 +9,14 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@mediapipe/face_detection": "^0.4.1646425229",
+    "@opentelemetry/api": "^1.9.0",
+    "@tensorflow-models/face-landmarks-detection": "^1.0.6",
+    "@tensorflow/tfjs": "^4.22.0",
+    "@tensorflow/tfjs-backend-webgl": "^4.22.0",
+    "face-api.js": "^0.22.2",
     "firebase": "^12.3.0",
+    "firebase-admin": "^13.5.0",
     "framer-motion": "^12.23.13",
     "lucide-react": "^0.544.0",
     "next": "15.5.3",
