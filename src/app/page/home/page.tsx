@@ -9,6 +9,7 @@ import kecanduanImg from '../../../../public/mood/Kecanduan.png';
 import moodswingImg from '../../../../public/mood/MoodSwing.png';
 import stressImg from '../../../../public/mood/Stress.png';
 import traumaImg from '../../../../public/mood/Trauma.png';
+import Navbar from '@/app/component/navbar';
 
 interface Condition {
   id: number;
@@ -60,6 +61,7 @@ export default function HomePage() {
   const [selectedCondition, setSelectedCondition] = useState<string | null>(null);
   const [particles, setParticles] = useState<Array<{ top: number; left: number; duration: number; delay: number }>>([]);
   const [isClient, setIsClient] = useState(false);
+  const [showStoryModal, setShowStoryModal] = useState(false);
   const detailsRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -101,6 +103,7 @@ export default function HomePage() {
 
   return (
     <section className="min-h-screen bg-gradient-to-b from-[#B3E5FC] to-[#FFF3E0] relative">
+      <Navbar/>
     <motion.div className="relative" initial="hidden" animate="visible" variants={containerVariants}>
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div className="relative w-full pb-24" variants={fadeUp}>
@@ -502,6 +505,7 @@ export default function HomePage() {
                 className="pt-6"
               >
                 <motion.button
+                  onClick={() => setShowStoryModal(true)}
                   whileHover={{ scale: 1.05, boxShadow: "0 10px 30px rgba(236, 72, 153, 0.3)" }}
                   whileTap={{ scale: 0.95 }}
                   className="bg-pink-500 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:bg-pink-600 transition-colors duration-300"
@@ -536,6 +540,84 @@ export default function HomePage() {
         </motion.div>
       </div>
     </section>
+
+    {/* Story Mode Selection Modal */}
+    <AnimatePresence>
+      {showStoryModal && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          onClick={() => setShowStoryModal(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            transition={{ type: "spring", duration: 0.5 }}
+            className="bg-white rounded-3xl p-8 max-w-2xl w-full mx-4 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="text-center mb-8">
+              <h3 className="text-3xl font-bold text-[#1E498E] mb-3">Pilih Mode Cerita</h3>
+              <p className="text-[#1E498E]/70">Bagaimana kamu ingin berbagi cerita dengan TenJin?</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Voice Story Mode */}
+              <Link href="/page/suaratenjin">
+                <motion.div
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl p-8 text-white cursor-pointer shadow-lg hover:shadow-2xl transition-shadow"
+                >
+                  <div className="text-5xl mb-4">🎤</div>
+                  <h4 className="text-2xl font-bold mb-3">Cerita Suara</h4>
+                  <p className="text-white/90 mb-4">
+                    Berbicara langsung dengan TenJin menggunakan suara kamu
+                  </p>
+                  <ul className="space-y-2 text-sm text-white/80">
+                    <li>✓ Lebih natural dan ekspresif</li>
+                    <li>✓ Tidak perlu mengetik</li>
+                    <li>✓ Respons real-time</li>
+                  </ul>
+                </motion.div>
+              </Link>
+
+              {/* Text Story Mode */}
+              <Link href="/page/ceritatenjin">
+                <motion.div
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-gradient-to-br from-[#1E498E] to-blue-600 rounded-2xl p-8 text-white cursor-pointer shadow-lg hover:shadow-2xl transition-shadow"
+                >
+                  <div className="text-5xl mb-4">✍️</div>
+                  <h4 className="text-2xl font-bold mb-3">Cerita Ketik</h4>
+                  <p className="text-white/90 mb-4">
+                    Tulis dan berbagi cerita kamu dengan mengetik
+                  </p>
+                  <ul className="space-y-2 text-sm text-white/80">
+                    <li>✓ Lebih privat dan tenang</li>
+                    <li>✓ Bisa diedit sebelum kirim</li>
+                    <li>✓ Riwayat chat tersimpan</li>
+                  </ul>
+                </motion.div>
+              </Link>
+            </div>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowStoryModal(false)}
+              className="mt-6 w-full bg-gray-200 text-[#1E498E] py-3 rounded-xl font-semibold hover:bg-gray-300 transition-colors"
+            >
+              Tutup
+            </motion.button>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   </section>
     
   );
