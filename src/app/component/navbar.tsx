@@ -10,10 +10,12 @@ import { User } from 'firebase/auth';
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [showAccountMenu, setShowAccountMenu] = useState(false);
+  const [showSiTenangMenu, setShowSiTenangMenu] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
   const pathname = usePathname();
   const accountMenuRef = useRef<HTMLDivElement>(null);
+  const siTenangMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -26,6 +28,9 @@ export default function Navbar() {
     const handleClickOutside = (event: MouseEvent) => {
       if (accountMenuRef.current && !accountMenuRef.current.contains(event.target as Node)) {
         setShowAccountMenu(false);
+      }
+      if (siTenangMenuRef.current && !siTenangMenuRef.current.contains(event.target as Node)) {
+        setShowSiTenangMenu(false);
       }
     };
 
@@ -51,7 +56,12 @@ export default function Navbar() {
 
   const navItems = [
     { href: '/', label: 'Beranda' },
-    { href: '/page/aipage', label: 'SiTenang' },
+  ];
+
+  const siTenangItems = [
+    { href: '/page/aipage', label: 'Deteksi AI', icon: '🤖' },
+    { href: '/page/suaratenjin', label: 'Suara TenJin', icon: '🎤' },
+    { href: '/page/ceritatenjin', label: 'Cerita TenJin', icon: '💬' },
   ];
 
   return (
@@ -79,6 +89,45 @@ export default function Navbar() {
               </Link>
             );
           })}
+          
+          {/* SiTenang Dropdown */}
+          <div className="relative" ref={siTenangMenuRef}>
+            <button
+              onClick={() => setShowSiTenangMenu(!showSiTenangMenu)}
+              className={`text-sm px-3 py-2 rounded-full transition-all duration-200 flex items-center gap-1 ${
+                siTenangItems.some(item => pathname === item.href)
+                  ? 'text-[#1E498E] bg-[#1E498E]/10'
+                  : 'text-black/70 hover:text-[#1E498E] hover:bg-black/5'
+              }`}
+            >
+              SiTenang
+              <svg className={`w-4 h-4 transition-transform duration-200 ${showSiTenangMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            
+            {showSiTenangMenu && (
+              <div className="absolute left-0 mt-2 w-56 bg-white/90 backdrop-blur-md rounded-xl border border-black/10 shadow-lg py-2 z-50">
+                {siTenangItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setShowSiTenangMenu(false)}
+                    className={`block px-4 py-2 text-sm transition-colors ${
+                      pathname === item.href
+                        ? 'text-[#1E498E] bg-[#1E498E]/10 font-medium'
+                        : 'text-black/70 hover:text-[#1E498E] hover:bg-[#1E498E]/10'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{item.icon}</span>
+                      <span>{item.label}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
           
           {/* Account Dropdown */}
           <div className="relative" ref={accountMenuRef}>
@@ -206,16 +255,41 @@ export default function Navbar() {
         <div className="max-w-[1280px] mx-auto px-2 py-1 grid grid-cols-4 gap-1">
           <Link href="/" className={`flex flex-col items-center justify-center py-2 rounded-xl ${pathname === '/' ? 'text-[#1E498E] bg-[#1E498E]/10' : 'text-black/70'}`}>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-              <path d="M11.47 3.84a.75.75 0 011.06 0l8.25 8.25a.75.75 0 01-1.06 1.06l-.72-.72V20.5A2.5 2.5 0 0016.5 23h-9A2.5 2.5 0 005 20.5v-8.07l-.72.72a.75.75 0 01-1.06-1.06l8.25-8.25z"/>
+              <path d="M11.47 3.84a.75.75 0 011.06 0l8.25 8.25a.75.75 0 01-1.06 1.06l-.72-.72V20.5A2.5 2.5 0 0116.5 23h-9A2.5 2.5 0 015 20.5v-8.07l-.72.72a.75.75 0 01-1.06-1.06l8.25-8.25z"/>
             </svg>
             <span className="text-xs mt-0.5">Beranda</span>
           </Link>
-          <Link href="/page/aipage" className={`flex flex-col items-center justify-center py-2 rounded-xl ${pathname === '/page/aipage' ? 'text-[#1E498E] bg-[#1E498E]/10' : 'text-black/70'}`}>
+          <button 
+            onClick={() => setShowSiTenangMenu(!showSiTenangMenu)}
+            className={`flex flex-col items-center justify-center py-2 rounded-xl relative ${siTenangItems.some(item => pathname === item.href) ? 'text-[#1E498E] bg-[#1E498E]/10' : 'text-black/70'}`}
+          >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
               <path d="M4.5 6.75A2.25 2.25 0 016.75 4.5h10.5A2.25 2.25 0 0119.5 6.75v10.5A2.25 2.25 0 0117.25 19.5H6.75A2.25 2.25 0 014.5 17.25V6.75zm3 1.5a.75.75 0 000 1.5h9a.75.75 0 000-1.5h-9zm0 3a.75.75 0 000 1.5h9a.75.75 0 000-1.5h-9zm0 3a.75.75 0 000 1.5h5.25a.75.75 0 000-1.5H7.5z" />
             </svg>
-            <span className="text-xs mt-0.5">AI</span>
-          </Link>
+            <span className="text-xs mt-0.5">SiTenang</span>
+            
+            {showSiTenangMenu && (
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-white/95 backdrop-blur-md rounded-xl border border-black/10 shadow-lg py-2">
+                {siTenangItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setShowSiTenangMenu(false)}
+                    className={`block px-4 py-2 text-sm transition-colors ${
+                      pathname === item.href
+                        ? 'text-[#1E498E] bg-[#1E498E]/10 font-medium'
+                        : 'text-black/70'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-base">{item.icon}</span>
+                      <span>{item.label}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </button>
           <Link href="/konsultasi" className={`flex flex-col items-center justify-center py-2 rounded-xl ${pathname === '/konsultasi' ? 'text-[#1E498E] bg-[#1E498E]/10' : 'text-black/70'}`}>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
               <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm6.967-2.28a.75.75 0 10-1.06 1.06L11.31 14l4.97-4.97a.75.75 0 00-1.06-1.06L11.31 11.88 9.217 9.72z" clipRule="evenodd" />

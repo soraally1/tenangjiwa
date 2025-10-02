@@ -167,19 +167,57 @@ export default function AIEmotionScanner() {
       return;
     }
 
+    // Stop any previous stream to avoid device busy errors
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: 640, height: 480 },
-      });
+      if (videoRef.current?.srcObject) {
+        (videoRef.current.srcObject as MediaStream).getTracks().forEach(t => t.stop());
+        videoRef.current.srcObject = null;
+      }
+
+      // Enumerate cameras and prefer the first available device
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const cameras = devices.filter(d => d.kind === 'videoinput');
+      const preferredDeviceId = cameras[0]?.deviceId;
+
+      // Build retry candidates from strict to permissive
+      const candidates: MediaStreamConstraints[] = [
+        { video: { deviceId: preferredDeviceId ? { exact: preferredDeviceId } : undefined, width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' } },
+        { video: { width: { ideal: 640 }, height: { ideal: 480 } } },
+        { video: { width: { ideal: 320 }, height: { ideal: 240 } } },
+        { video: { facingMode: 'user' } },
+        { video: true },
+      ];
+
+      // Small timeout wrapper to avoid long hangs
+      const getUserMediaWithTimeout = (constraints: MediaStreamConstraints, timeoutMs = 7000) =>
+        new Promise<MediaStream>((resolve, reject) => {
+          const timer = setTimeout(() => reject(new Error('getUserMedia timeout')), timeoutMs);
+          navigator.mediaDevices.getUserMedia(constraints)
+            .then(s => { clearTimeout(timer); resolve(s); })
+            .catch(e => { clearTimeout(timer); reject(e); });
+        });
+
+      let stream: MediaStream | null = null;
+      let lastErr: unknown = null;
+      for (const c of candidates) {
+        try {
+          stream = await getUserMediaWithTimeout(c);
+          break;
+        } catch (e) {
+          lastErr = e;
+        }
+      }
+
+      if (!stream) throw lastErr ?? new Error('Unable to start camera');
+
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         setScanDuration(0);
-        // Start face detection
         await startDetection(videoRef.current);
       }
     } catch (error) {
-      console.error("Error accessing camera:", error);
-      alert("Tidak dapat mengakses kamera. Pastikan izin kamera telah diberikan.");
+      console.error('Error accessing camera:', error);
+      alert('Gagal mengakses kamera. Pastikan izin diberikan, tidak dipakai aplikasi lain, dan coba lagi.');
     }
   };
 
