@@ -5,6 +5,7 @@ import {
   User,
   UserCredential
 } from 'firebase/auth';
+import { FirebaseError } from 'firebase/app';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, googleProvider, db } from './firebase';
 
@@ -18,7 +19,7 @@ export interface UserData {
   uid: string;
   email: string;
   displayName: string;
-  photoURL?: string;
+  photoURL: string | null;
   createdAt: Date;
   lastLoginAt: Date;
 }
@@ -38,17 +39,24 @@ export const signupWithEmail = async (
       displayName: name
     });
 
-    // Save user data to Firestore
-    const userData: UserData = {
-      uid: userCredential.user.uid,
-      email: userCredential.user.email!,
-      displayName: name,
-      photoURL: userCredential.user.photoURL || undefined,
-      createdAt: new Date(),
-      lastLoginAt: new Date()
-    };
+    // Save user data to Firestore (non-blocking)
+    try {
+      console.log('Attempting to save new user to Firestore...');
+      const userData: UserData = {
+        uid: userCredential.user.uid,
+        email: userCredential.user.email!,
+        displayName: name,
+        photoURL: userCredential.user.photoURL || null,
+        createdAt: new Date(),
+        lastLoginAt: new Date()
+      };
 
-    await setDoc(doc(db, 'users', userCredential.user.uid), userData);
+      await setDoc(doc(db, 'users', userCredential.user.uid), userData);
+      console.log('✓ New user saved to Firestore:', userData);
+    } catch (firestoreError) {
+      console.error('❌ Firestore error (signup still successful):', firestoreError);
+      // Signup succeeds even if Firestore fails
+    }
 
     return {
       success: true,
@@ -57,24 +65,28 @@ export const signupWithEmail = async (
   } catch (error: unknown) {
     let errorMessage = 'Terjadi kesalahan saat mendaftar';
     
-    switch ((error as any).code) {
-      case 'auth/email-already-in-use':
-        errorMessage = 'Email sudah digunakan';
-        break;
-      case 'auth/invalid-email':
-        errorMessage = 'Format email tidak valid';
-        break;
-      case 'auth/weak-password':
-        errorMessage = 'Password terlalu lemah. Minimal 6 karakter';
-        break;
-      case 'auth/operation-not-allowed':
-        errorMessage = 'Operasi tidak diizinkan';
-        break;
-      case 'auth/network-request-failed':
-        errorMessage = 'Koneksi internet bermasalah';
-        break;
-      default:
-        errorMessage = (error as any).message || errorMessage;
+    if (error instanceof FirebaseError) {
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          errorMessage = 'Email sudah digunakan';
+          break;
+        case 'auth/invalid-email':
+          errorMessage = 'Format email tidak valid';
+          break;
+        case 'auth/weak-password':
+          errorMessage = 'Password terlalu lemah. Minimal 6 karakter';
+          break;
+        case 'auth/operation-not-allowed':
+          errorMessage = 'Operasi tidak diizinkan';
+          break;
+        case 'auth/network-request-failed':
+          errorMessage = 'Koneksi internet bermasalah';
+          break;
+        default:
+          errorMessage = error.message || errorMessage;
+      }
+    } else if (error instanceof Error) {
+      errorMessage = error.message;
     }
     
     return {
@@ -90,25 +102,35 @@ export const signupWithGoogle = async (): Promise<SignupResult> => {
     const result: UserCredential = await signInWithPopup(auth, googleProvider);
     
     // Check if this is a new user
-    const isNewUser = (result as any).additionalUserInfo?.isNewUser;
+    const isNewUser = result.user.metadata.creationTime === result.user.metadata.lastSignInTime;
     
-    if (isNewUser) {
-      // Save user data to Firestore for new users
-      const userData: UserData = {
-        uid: result.user.uid,
-        email: result.user.email!,
-        displayName: result.user.displayName || 'User',
-        photoURL: result.user.photoURL || undefined,
-        createdAt: new Date(),
-        lastLoginAt: new Date()
-      };
+    // Save/update user data in Firestore (non-blocking)
+    try {
+      console.log('Attempting to save Google user to Firestore...', { isNewUser });
+      
+      if (isNewUser) {
+        // Save user data to Firestore for new users
+        const userData: UserData = {
+          uid: result.user.uid,
+          email: result.user.email!,
+          displayName: result.user.displayName || 'User',
+          photoURL: result.user.photoURL || null,
+          createdAt: new Date(),
+          lastLoginAt: new Date()
+        };
 
-      await setDoc(doc(db, 'users', result.user.uid), userData);
-    } else {
-      // Update last login for existing users
-      await setDoc(doc(db, 'users', result.user.uid), {
-        lastLoginAt: new Date()
-      }, { merge: true });
+        await setDoc(doc(db, 'users', result.user.uid), userData);
+        console.log('✓ New Google user saved to Firestore:', userData);
+      } else {
+        // Update last login for existing users
+        await setDoc(doc(db, 'users', result.user.uid), {
+          lastLoginAt: new Date()
+        }, { merge: true });
+        console.log('✓ Existing user login time updated');
+      }
+    } catch (firestoreError) {
+      console.error('❌ Firestore error (signup still successful):', firestoreError);
+      // Signup succeeds even if Firestore fails
     }
 
     return {
@@ -118,21 +140,25 @@ export const signupWithGoogle = async (): Promise<SignupResult> => {
   } catch (error: unknown) {
     let errorMessage = 'Terjadi kesalahan saat mendaftar dengan Google';
     
-    switch ((error as any).code) {
-      case 'auth/popup-closed-by-user':
-        errorMessage = 'Pendaftaran dibatalkan';
-        break;
-      case 'auth/popup-blocked':
-        errorMessage = 'Popup diblokir oleh browser';
-        break;
-      case 'auth/cancelled-popup-request':
-        errorMessage = 'Pendaftaran dibatalkan';
-        break;
-      case 'auth/network-request-failed':
-        errorMessage = 'Koneksi internet bermasalah';
-        break;
-      default:
-        errorMessage = (error as any).message || errorMessage;
+    if (error instanceof FirebaseError) {
+      switch (error.code) {
+        case 'auth/popup-closed-by-user':
+          errorMessage = 'Pendaftaran dibatalkan';
+          break;
+        case 'auth/popup-blocked':
+          errorMessage = 'Popup diblokir oleh browser';
+          break;
+        case 'auth/cancelled-popup-request':
+          errorMessage = 'Pendaftaran dibatalkan';
+          break;
+        case 'auth/network-request-failed':
+          errorMessage = 'Koneksi internet bermasalah';
+          break;
+        default:
+          errorMessage = error.message || errorMessage;
+      }
+    } else if (error instanceof Error) {
+      errorMessage = error.message;
     }
     
     return {

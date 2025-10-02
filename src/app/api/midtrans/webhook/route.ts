@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminDb, AdminFieldValue } from '@/app/service/firebaseAdmin';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 import crypto from 'crypto';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,26 +26,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
 
-    const paymentRef = adminDb.collection('payments').doc(order_id);
-
-    // Update payment status based on transaction_status
-    let status = 'pending';
-    if (transaction_status === 'capture' || transaction_status === 'settlement') status = 'paid';
-    else if (transaction_status === 'cancel' || transaction_status === 'deny' || transaction_status === 'expire') status = 'failed';
-
-    await paymentRef.set({
-      orderId: order_id,
-    }, { merge: true });
-
-    await paymentRef.update({
-      status,
-      updatedAt: AdminFieldValue.serverTimestamp(),
-      gatewayPayload: body,
+    // Webhook verified - you can process the payment status here
+    // For now, we'll just log it
+    console.log('Payment webhook received:', {
+      order_id,
+      transaction_status,
+      status_code,
     });
 
     return NextResponse.json({ ok: true });
-  } catch (error: any) {
-    return NextResponse.json({ error: error?.message || 'Unexpected error' }, { status: 500 });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unexpected error';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 

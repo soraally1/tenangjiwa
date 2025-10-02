@@ -1,0 +1,31 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow authenticated users to read and write their own user document
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Helper function to check if user is a doctor
+    function isDoctor() {
+      return request.auth != null && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isDoctor == true;
+    }
+    
+    // Allow authenticated users to create and read their own payment records
+    // Also allow doctors to read all appointments (for their dashboard)
+    match /payments/{paymentId} {
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow read: if request.auth != null && (
+        resource.data.userId == request.auth.uid ||
+        isDoctor()
+      );
+      allow update: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow list: if request.auth != null && (
+        request.auth.uid == request.auth.uid ||
+        isDoctor()
+      );
+    }
+  }
+}

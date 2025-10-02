@@ -6,7 +6,8 @@ import {
   UserCredential 
 } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
-import { auth, googleProvider } from './firebase';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { auth, googleProvider, db } from './firebase';
 
 export interface LoginResult {
   success: boolean;
@@ -19,10 +20,49 @@ export interface LogoutResult {
   error?: string;
 }
 
+export interface UserData {
+  uid: string;
+  email: string;
+  displayName: string;
+  photoURL: string | null;
+  createdAt: Date;
+  lastLoginAt: Date;
+}
+
 // Email and Password Login
 export const loginWithEmail = async (email: string, password: string): Promise<LoginResult> => {
   try {
     const userCredential: UserCredential = await signInWithEmailAndPassword(auth, email, password);
+    
+    // Update or create user data in Firestore (non-blocking)
+    try {
+      const userRef = doc(db, 'users', userCredential.user.uid);
+      const userDoc = await getDoc(userRef);
+      
+      if (userDoc.exists()) {
+        // Update last login time for existing users
+        await setDoc(userRef, {
+          lastLoginAt: new Date()
+        }, { merge: true });
+        console.log('✓ User login time updated in Firestore');
+      } else {
+        // Create user document if it doesn't exist (legacy users)
+        const userData: UserData = {
+          uid: userCredential.user.uid,
+          email: userCredential.user.email!,
+          displayName: userCredential.user.displayName || 'User',
+          photoURL: userCredential.user.photoURL || null,
+          createdAt: new Date(),
+          lastLoginAt: new Date()
+        };
+        await setDoc(userRef, userData);
+        console.log('✓ User data created in Firestore');
+      }
+    } catch (firestoreError) {
+      console.error('Firestore error (login still successful):', firestoreError);
+      // Login succeeds even if Firestore fails
+    }
+    
     return {
       success: true,
       user: userCredential.user
@@ -69,6 +109,37 @@ export const loginWithEmail = async (email: string, password: string): Promise<L
 export const loginWithGoogle = async (): Promise<LoginResult> => {
   try {
     const result: UserCredential = await signInWithPopup(auth, googleProvider);
+    
+    // Update or create user data in Firestore (non-blocking)
+    try {
+      console.log('Attempting to save user to Firestore...');
+      const userRef = doc(db, 'users', result.user.uid);
+      const userDoc = await getDoc(userRef);
+      
+      if (userDoc.exists()) {
+        // Update last login time for existing users
+        await setDoc(userRef, {
+          lastLoginAt: new Date()
+        }, { merge: true });
+        console.log('✓ User login time updated in Firestore');
+      } else {
+        // Create user document if it doesn't exist (new users)
+        const userData: UserData = {
+          uid: result.user.uid,
+          email: result.user.email!,
+          displayName: result.user.displayName || 'User',
+          photoURL: result.user.photoURL || null,
+          createdAt: new Date(),
+          lastLoginAt: new Date()
+        };
+        await setDoc(userRef, userData);
+        console.log('✓ New user data created in Firestore:', userData);
+      }
+    } catch (firestoreError) {
+      console.error('❌ Firestore error (login still successful):', firestoreError);
+      // Login succeeds even if Firestore fails
+    }
+    
     return {
       success: true,
       user: result.user

@@ -5,7 +5,10 @@ import { useState } from "react"
 import Image from "next/image"
 import Script from "next/script"
 import { getCurrentUser } from "@/app/service/loginservice"
+import { db } from "@/app/service/firebase"
+import { doc, setDoc } from "firebase/firestore"
 import Navbar from "../component/navbar"
+import BookingHistory from "../component/BookingHistory"
 // Types
 interface Doctor {
   id: string
@@ -71,10 +74,10 @@ export default function Konsultasi() {
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null)
   const [selectedTimes, setSelectedTimes] = useState<string[]>([])
-  const [selectedPayment, setSelectedPayment] = useState<string | null>(null)
   const [paymentStep, setPaymentStep] = useState(1)
   const [processingPayment, setProcessingPayment] = useState(false)
   const [bookedSlots] = useState<BookedSlots>({})
+  const [midtransReady, setMidtransReady] = useState(false)
 
   // Animation variants
   const containerVariants = {
@@ -264,22 +267,63 @@ export default function Konsultasi() {
         if (!res.ok) throw new Error(data?.error || 'Gagal membuat transaksi')
 
         const snapToken: string = data.token as string
-        // const orderId: string = data.orderId as string
+        const orderId: string = data.orderId as string
 
+        console.log('Got Midtrans token:', snapToken)
+
+        // Store payment record in Firestore
+        const paymentRef = doc(db, 'payments', orderId)
+        await setDoc(paymentRef, {
+          orderId,
+          userId,
+          userEmail,
+          userName,
+          doctorId: selectedDoctor?.id,
+          doctorName: selectedDoctor?.name,
+          selectedDate: selectedDate?.toISOString(),
+          selectedTimes,
+          amount: totalPayment,
+          status: 'pending',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        })
+
+        console.log('Payment record saved to Firestore')
+
+        // Check if Midtrans Snap is loaded
         const w = window as unknown as { snap?: { pay: (token: string, opts: Record<string, unknown>) => void } }
+        
         if (!w.snap) {
-          throw new Error('Midtrans Snap belum siap')
+          console.error('Midtrans Snap not loaded! midtransReady:', midtransReady)
+          console.error('window.snap:', w.snap)
+          setProcessingPayment(false)
+          alert('Midtrans belum siap. Silakan tunggu beberapa detik dan coba lagi.')
+          return
         }
 
+        console.log('Opening Midtrans popup...')
         w.snap.pay(snapToken, {
-          onSuccess: function () {
+          onSuccess: async function () {
+            // Update payment status to success
+            await setDoc(paymentRef, {
+              status: 'paid',
+              updatedAt: new Date(),
+            }, { merge: true })
+            setProcessingPayment(false)
             setPaymentStep(3)
           },
           onPending: function () {
-            setPaymentStep(2)
-          },
-          onError: function () {
             setProcessingPayment(false)
+            alert('Pembayaran sedang diproses. Silakan selesaikan pembayaran Anda.')
+          },
+          onError: async function () {
+            // Update payment status to failed
+            await setDoc(paymentRef, {
+              status: 'failed',
+              updatedAt: new Date(),
+            }, { merge: true })
+            setProcessingPayment(false)
+            alert('Terjadi kesalahan saat memproses pembayaran')
           },
           onClose: function () {
             setProcessingPayment(false)
@@ -288,16 +332,10 @@ export default function Konsultasi() {
       } catch (e) {
         console.error(e)
         setProcessingPayment(false)
+        alert('Terjadi kesalahan: ' + (e instanceof Error ? e.message : 'Unknown error'))
       }
     }
 
-    const confirmPayment = async () => {
-      setProcessingPayment(true)
-      setTimeout(() => {
-        setProcessingPayment(false)
-        setPaymentStep(3)
-      }, 2000)
-    }
 
     return (
       <motion.div
@@ -333,36 +371,27 @@ export default function Konsultasi() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                {["BCA", "Gopay"].map((method) => (
-                  <motion.button
-                    key={method}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setSelectedPayment(method)}
-                    className={`p-6 rounded-2xl border-2 transition-all ${selectedPayment === method
-                        ? "border-[#1E498E] bg-[#B3E5FC]/30"
-                        : "border-[#FFF3E0] bg-white hover:border-[#B3E5FC]"
-                      }`}
-                  >
-                    <div className="text-center">
-                      <div className="w-12 h-12 bg-[#1E498E] rounded-full mx-auto mb-2 flex items-center justify-center text-white font-bold">
-                        {method.charAt(0)}
-                      </div>
-                      <span className="font-semibold text-[#1E498E]">{method}</span>
+              <div className="bg-white/50 backdrop-blur-sm p-4 rounded-2xl">
+                <div className="text-center text-[#1E498E]/70 text-sm">
+                  {!midtransReady ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="w-4 h-4 border-2 border-[#1E498E] border-t-transparent rounded-full animate-spin" />
+                      Memuat sistem pembayaran...
                     </div>
-                  </motion.button>
-                ))}
+                  ) : (
+                    "Pilih metode pembayaran di halaman berikutnya"
+                  )}
+                </div>
               </div>
 
               <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: midtransReady && !processingPayment ? 1.02 : 1 }}
+                whileTap={{ scale: midtransReady && !processingPayment ? 0.98 : 1 }}
                 onClick={handlePayment}
-                disabled={!selectedPayment || processingPayment}
-                className={`w-full py-4 rounded-2xl font-semibold text-lg transition-all ${processingPayment || !selectedPayment
+                disabled={processingPayment || !midtransReady}
+                className={`w-full py-4 rounded-2xl font-semibold text-lg transition-all shadow-lg ${processingPayment || !midtransReady
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-[#1E498E] text-white hover:bg-[#1E498E]/90 shadow-lg"
+                    : "bg-gradient-to-r from-[#1E498E] to-[#3B82F6] text-white hover:from-[#1E498E]/90 hover:to-[#3B82F6]/90"
                   }`}
               >
                 {processingPayment ? (
@@ -370,45 +399,13 @@ export default function Konsultasi() {
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     Memproses...
                   </div>
-                ) : (
-                  "Bayar Sekarang"
-                )}
-              </motion.button>
-            </motion.div>
-          )}
-
-          {paymentStep === 2 && (
-            <motion.div
-              key="payment-step-2"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="space-y-6"
-            >
-              <div className="bg-gradient-to-r from-[#FFF3E0] to-[#B3E5FC] p-6 rounded-2xl">
-                <h3 className="font-bold text-[#1E498E] mb-4">Menunggu Pembayaran</h3>
-                <p className="text-[#1E498E] mb-4">Silakan transfer ke nomor rekening berikut:</p>
-                <div className="bg-white p-4 rounded-xl">
-                  <p className="font-mono text-xl font-bold text-[#1E498E]">1234-5678-9012</p>
-                  <p className="text-sm text-gray-600">a.n. Klinik Sehat</p>
-                </div>
-              </div>
-
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={confirmPayment}
-                disabled={processingPayment}
-                className={`w-full py-4 rounded-2xl font-semibold text-lg ${processingPayment ? "bg-gray-300 text-gray-500" : "bg-[#B3E5FC] text-[#1E498E] hover:bg-[#B3E5FC]/80"
-                  }`}
-              >
-                {processingPayment ? (
+                ) : !midtransReady ? (
                   <div className="flex items-center justify-center gap-2">
-                    <div className="w-5 h-5 border-2 border-[#1E498E] border-t-transparent rounded-full animate-spin" />
-                    Mengkonfirmasi...
+                    <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                    Menunggu Midtrans...
                   </div>
                 ) : (
-                  "Konfirmasi Pembayaran"
+                  "Bayar Sekarang"
                 )}
               </motion.button>
             </motion.div>
@@ -438,7 +435,6 @@ export default function Konsultasi() {
                 onClick={() => {
                   setSelectedDate(null)
                   setSelectedTimes([])
-                  setSelectedPayment(null)
                   setPaymentStep(1)
                   setSelectedDoctor(null)
                 }}
@@ -456,7 +452,18 @@ export default function Konsultasi() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#B3E5FC] via-[#FFF3E0] to-[#B3E5FC] relative overflow-hidden">
-      <Script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY as string} strategy="afterInteractive" />
+      <Script 
+        src="https://app.sandbox.midtrans.com/snap/snap.js" 
+        data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY as string} 
+        strategy="afterInteractive"
+        onLoad={() => {
+          console.log('Midtrans Snap script loaded successfully')
+          setMidtransReady(true)
+        }}
+        onError={() => {
+          console.error('Failed to load Midtrans Snap script')
+        }}
+      />
       <Navbar />
 
       {/* Enhanced Background decorations */}
@@ -849,6 +856,9 @@ export default function Konsultasi() {
           </div>
         </motion.div>
       </div>
+
+      {/* Floating Booking History Button */}
+      <BookingHistory />
     </div>
   )
 }
