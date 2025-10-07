@@ -364,7 +364,7 @@ export default function HomePage() {
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-[#1E498E]/20 to-transparent rounded-2xl transform rotate-1 group-hover:rotate-2 transition-transform duration-300"></div>
                 <Image
-                  src="/dokter.png"
+                  src="/Dokter.png"
                   alt="Professional Psychiatrist"
                   width={600}
                   height={400}
