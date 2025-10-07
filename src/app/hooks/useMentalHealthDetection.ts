@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { enhancedFaceDetectionService, EnhancedFaceDetectionResult } from '@/app/service/enhancedFaceDetectionService';
+import { enhancedFaceDetectionService } from '@/app/service/enhancedFaceDetectionService';
 import { mentalHealthDetectionService, MentalHealthAssessment, EyeTrackingData, BehavioralPatterns } from '@/app/service/mentalHealthDetectionService';
 import { EmotionData } from '@/app/service/faceDetectionService';
 
@@ -114,7 +114,7 @@ export const useMentalHealthDetection = () => {
     enhancedFaceDetectionService.resetSession();
   }, []);
 
-  const drawFaceOverlay = useCallback((canvas: HTMLCanvasElement, video: HTMLVideoElement) => {
+  const drawFaceOverlay = useCallback((canvas: HTMLCanvasElement) => {
     if (canvasRef.current) {
       canvasRef.current = canvas;
     }

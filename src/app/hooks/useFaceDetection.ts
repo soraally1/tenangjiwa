@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { faceDetectionService, FaceDetectionResult, EmotionData } from '@/app/service/faceDetectionService';
+import { useState, useRef, useCallback, useEffect } from 'react'
+import { faceDetectionService, EmotionData } from '../service/faceDetectionService';
 
 export const useFaceDetection = () => {
   const [isModelLoaded, setIsModelLoaded] = useState(false);
@@ -91,7 +91,7 @@ export const useFaceDetection = () => {
     setCurrentEmotion(null);
   }, []);
 
-  const drawFaceOverlay = useCallback((canvas: HTMLCanvasElement, video: HTMLVideoElement) => {
+  const drawFaceOverlay = useCallback((canvas: HTMLCanvasElement) => {
     if (canvasRef.current) {
       canvasRef.current = canvas;
     }

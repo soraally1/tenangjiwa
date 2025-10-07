@@ -1,10 +1,11 @@
 "use client"
 import { motion, AnimatePresence } from "framer-motion"
-import { Calendar, Clock, CheckCircle, XCircle, Loader } from "lucide-react"
+import { Calendar, Clock, CheckCircle, XCircle, Loader, MessageCircle } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
+import { useRouter } from "next/navigation"
 import { db } from "@/app/service/firebase"
 import { collection, query, where, getDocs } from "firebase/firestore"
-import { getCurrentUser } from "@/app/service/loginservice"
+import { getCurrentUserAsync } from "@/app/service/loginservice"
 
 interface Booking {
   orderId: string
@@ -17,14 +18,15 @@ interface Booking {
 }
 
 export default function BookingHistory() {
-  const [bookings, setBookings] = useState<Booking[]>([])
-  const [loading, setLoading] = useState(true)
+  const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
+  const [bookings, setBookings] = useState<Booking[]>([])
+  const [loading, setLoading] = useState(false)
 
   const fetchBookings = useCallback(async () => {
     try {
       setLoading(true)
-      const user = getCurrentUser()
+      const user = await getCurrentUserAsync()
       if (!user) {
         console.log('No user logged in')
         setLoading(false)
@@ -101,6 +103,7 @@ export default function BookingHistory() {
     
     return `${days[date.getDay()]}, ${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`
   }
+
 
   const getStatusConfig = (status: string) => {
     switch (status) {
@@ -260,6 +263,19 @@ export default function BookingHistory() {
                                 Rp {booking.amount.toLocaleString('id-ID')}
                               </span>
                             </div>
+
+                            {/* Join Consultation Room Button */}
+                            {booking.status === 'paid' && (
+                              <motion.button
+                                onClick={() => router.push(`/page/konsulroom?appointmentId=${booking.orderId}`)}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                className="w-full mt-4 bg-gradient-to-r from-[#1E498E] to-[#3B82F6] text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transition-shadow"
+                              >
+                                <MessageCircle className="w-5 h-5" />
+                                Masuk Ruang Konsultasi
+                              </motion.button>
+                            )}
                           </div>
                         </motion.div>
                       )

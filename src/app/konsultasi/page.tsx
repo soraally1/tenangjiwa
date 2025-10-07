@@ -1,12 +1,12 @@
 "use client"
 import { motion, AnimatePresence } from "framer-motion"
 import { ChevronLeft, ChevronRight, CheckCircle, Calendar, Stethoscope, Star, Clock, Award, Users, Heart } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import Script from "next/script"
-import { getCurrentUser } from "@/app/service/loginservice"
+import { getCurrentUserAsync } from "@/app/service/loginservice"
 import { db } from "@/app/service/firebase"
-import { doc, setDoc } from "firebase/firestore"
+import { doc, setDoc, collection, query, where, getDocs } from "firebase/firestore"
 import Navbar from "../component/navbar"
 import BookingHistory from "../component/BookingHistory"
 // Types
@@ -30,6 +30,8 @@ interface BookedSlots {
   [key: string]: {
     isBooked: boolean
     status?: string
+    bookedBy?: string
+    orderId?: string
   }
 }
 
@@ -38,7 +40,7 @@ const CONSULTATION_PRICE = 25000
 
 const doctors: Doctor[] = [
   {
-    id: "dr-Iqbal-Bayu-Aji",
+    id: "VYXqFBGAYpgILiUyymgCIOMNxEE3",
     name: "dr. Iqbal Bayu Aji",
     specialty: "Sp.KJ - Psikiater",
     experience: "20+ tahun pengalaman",
@@ -53,7 +55,7 @@ const doctors: Doctor[] = [
     ],
   },
   {
-    id: "dr-Banon-Kenta-Oktora",
+    id: "JbBDgEDOjMWFpKEcjknmHqzUrgp2",
     name: "dr. Banon Kenta Oktora",
     specialty: "Sp.KJ - Psikiater",
     experience: "15+ tahun pengalaman",
@@ -76,8 +78,64 @@ export default function Konsultasi() {
   const [selectedTimes, setSelectedTimes] = useState<string[]>([])
   const [paymentStep, setPaymentStep] = useState(1)
   const [processingPayment, setProcessingPayment] = useState(false)
-  const [bookedSlots] = useState<BookedSlots>({})
+  const [bookedSlots, setBookedSlots] = useState<BookedSlots>({})
+  const [loadingSlots, setLoadingSlots] = useState(false)
   const [midtransReady, setMidtransReady] = useState(false)
+
+  // Function to fetch existing bookings for a specific date and doctor
+  const fetchBookedSlots = async (doctorId: string, date: Date) => {
+    if (!doctorId || !date) return
+
+    setLoadingSlots(true)
+    try {
+      // Format date to match the stored format in Firestore
+      const dateString = date.toISOString().split('T')[0] // YYYY-MM-DD format
+      
+      // Query payments collection for bookings on this date with this doctor
+      const paymentsRef = collection(db, 'payments')
+      const q = query(
+        paymentsRef,
+        where('doctorId', '==', doctorId),
+        where('selectedDate', '>=', dateString + 'T00:00:00.000Z'),
+        where('selectedDate', '<=', dateString + 'T23:59:59.999Z'),
+        where('status', 'in', ['paid', 'pending']) // Only consider paid or pending payments
+      )
+      
+      const querySnapshot = await getDocs(q)
+      const newBookedSlots: BookedSlots = {}
+      
+      querySnapshot.forEach((doc) => {
+        const data = doc.data()
+        if (data.selectedTimes && Array.isArray(data.selectedTimes)) {
+          data.selectedTimes.forEach((time: string) => {
+            newBookedSlots[time] = {
+              isBooked: true,
+              status: data.status,
+              bookedBy: data.userId,
+              orderId: doc.id
+            }
+          })
+        }
+      })
+      
+      setBookedSlots(newBookedSlots)
+    } catch (error) {
+      console.error('Error fetching booked slots:', error)
+      // Reset to empty if there's an error
+      setBookedSlots({})
+    } finally {
+      setLoadingSlots(false)
+    }
+  }
+
+  // Load booked slots when doctor or date changes
+  useEffect(() => {
+    if (selectedDoctor && selectedDate) {
+      fetchBookedSlots(selectedDoctor.id, selectedDate)
+    } else {
+      setBookedSlots({})
+    }
+  }, [selectedDoctor, selectedDate])
 
   // Animation variants
   const containerVariants = {
@@ -187,15 +245,24 @@ export default function Konsultasi() {
   }
 
   const handleTimeSelection = (time: string) => {
-    if (bookedSlots[time]?.isBooked) return
+    // Check if slot is already booked
+    if (bookedSlots[time]?.isBooked) {
+      alert('Maaf, waktu ini sudah dipesan oleh pasien lain. Silakan pilih waktu yang lain.')
+      return
+    }
 
     setSelectedTimes((prev) => {
       if (prev.includes(time)) {
+        // Remove time if already selected
         return prev.filter((t) => t !== time)
       } else if (prev.length < 5) {
+        // Add time if under limit
         return [...prev, time]
+      } else {
+        // Show message if trying to select more than 5 slots
+        alert('Maksimal 5 slot konsultasi per pemesanan.')
+        return prev
       }
-      return prev
     })
   }
 
@@ -238,10 +305,20 @@ export default function Konsultasi() {
         setProcessingPayment(true)
 
         // Get current user info from Firebase Auth
-        const user = getCurrentUser()
+        const user = await getCurrentUserAsync()
         if (!user) {
           setProcessingPayment(false)
           alert('Silakan login untuk melanjutkan pembayaran')
+          return
+        }
+
+        // Double-check if any selected times are now booked (race condition protection)
+        const conflictingTimes = selectedTimes.filter(time => bookedSlots[time]?.isBooked)
+        if (conflictingTimes.length > 0) {
+          setProcessingPayment(false)
+          alert(`Maaf, waktu ${conflictingTimes.join(', ')} sudah dipesan oleh pasien lain. Silakan pilih waktu yang lain.`)
+          // Remove conflicting times from selection
+          setSelectedTimes(prev => prev.filter(time => !conflictingTimes.includes(time)))
           return
         }
 
@@ -309,6 +386,12 @@ export default function Konsultasi() {
               status: 'paid',
               updatedAt: new Date(),
             }, { merge: true })
+            
+            // Refresh booked slots to reflect the new booking
+            if (selectedDoctor && selectedDate) {
+              await fetchBookedSlots(selectedDoctor.id, selectedDate)
+            }
+            
             setProcessingPayment(false)
             setPaymentStep(3)
           },
@@ -776,7 +859,15 @@ export default function Konsultasi() {
                         animate={{ opacity: 1, y: 0 }}
                         className="mb-8"
                       >
-                        <h4 className="text-xl font-bold text-[#1E498E] mb-6">Pilih Waktu Konsultasi</h4>
+                        <div className="flex items-center justify-between mb-6">
+                          <h4 className="text-xl font-bold text-[#1E498E]">Pilih Waktu Konsultasi</h4>
+                          {loadingSlots && (
+                            <div className="flex items-center gap-2 text-[#1E498E]/70">
+                              <div className="w-4 h-4 border-2 border-[#1E498E] border-t-transparent rounded-full animate-spin" />
+                              <span className="text-sm">Memuat...</span>
+                            </div>
+                          )}
+                        </div>
                         <div className="space-y-4">
                           {selectedDoctor.schedules.map((slot, index) => {
                             const isBooked = bookedSlots[slot.time]?.isBooked
@@ -805,21 +896,30 @@ export default function Konsultasi() {
                                   </div>
                                 </div>
                                 <motion.button
-                                  whileHover={!isBooked ? { scale: 1.05 } : {}}
-                                  whileTap={!isBooked ? { scale: 0.95 } : {}}
+                                  whileHover={!isBooked && !loadingSlots ? { scale: 1.05 } : {}}
+                                  whileTap={!isBooked && !loadingSlots ? { scale: 0.95 } : {}}
                                   onClick={() => handleTimeSelection(slot.time)}
-                                  disabled={isBooked}
+                                  disabled={isBooked || loadingSlots}
                                   className={`
-                                    px-6 py-3 rounded-xl font-bold transition-all
+                                    px-6 py-3 rounded-xl font-bold transition-all min-w-[100px]
                                     ${isBooked
-                                      ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                                      : isSelected
-                                        ? "bg-white text-[#1E498E] shadow-lg"
-                                        : "bg-[#1E498E] text-white hover:bg-[#1E498E]/80"
+                                      ? "bg-red-100 text-red-600 cursor-not-allowed border border-red-200"
+                                      : loadingSlots
+                                        ? "bg-gray-100 text-gray-400 cursor-wait"
+                                        : isSelected
+                                          ? "bg-white text-[#1E498E] shadow-lg border border-[#1E498E]"
+                                          : "bg-[#1E498E] text-white hover:bg-[#1E498E]/80"
                                     }
                                   `}
                                 >
-                                  {isBooked ? "Terpesan" : isSelected ? "Terpilih" : "Pilih"}
+                                  {loadingSlots 
+                                    ? "..." 
+                                    : isBooked 
+                                      ? "Terpesan" 
+                                      : isSelected 
+                                        ? "Terpilih" 
+                                        : "Pilih"
+                                  }
                                 </motion.button>
                               </motion.div>
                             )

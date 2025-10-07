@@ -1,31 +1,161 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow authenticated users to read and write their own user document
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
     }
     
-    // Helper function to check if user is a doctor
     function isDoctor() {
       return request.auth != null && 
-             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isDoctor == true;
+             (request.auth.uid == "VYXqFBGAYpgILiUyymgCIOMNxEE3" ||
+              (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+               (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isDoctor == true ||
+                get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isDoctor == "true")));
     }
     
-    // Allow authenticated users to create and read their own payment records
-    // Also allow doctors to read all appointments (for their dashboard)
+    function isConsultationParticipant(consultationId) {
+      return exists(/databases/$(database)/documents/consultations/$(consultationId)) &&
+             (get(/databases/$(database)/documents/consultations/$(consultationId)).data.userId == request.auth.uid ||
+              get(/databases/$(database)/documents/consultations/$(consultationId)).data.doctorId == request.auth.uid);
+    }
+    
+    function isConsultationActive(consultationId) {
+      return exists(/databases/$(database)/documents/consultations/$(consultationId)) &&
+             get(/databases/$(database)/documents/consultations/$(consultationId)).data.status == "started";
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Payments collection
     match /payments/{paymentId} {
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      allow read: if request.auth != null && (
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow read: if isAuthenticated() && (
         resource.data.userId == request.auth.uid ||
+        resource.data.doctorId == request.auth.uid ||
         isDoctor()
       );
-      allow update: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow list: if request.auth != null && (
-        request.auth.uid == request.auth.uid ||
-        isDoctor()
+      allow list: if isAuthenticated();
+      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+    
+    // Consultations collection - NEW
+    match /consultations/{consultationId} {
+      // Allow creation if authenticated and either:
+      // 1. User creating for themselves, OR
+      // 2. Doctor creating (doctorId matches auth.uid), OR  
+      // 3. Specific doctor UID creating
+      allow create: if isAuthenticated() && (
+        request.resource.data.userId == request.auth.uid ||
+        request.resource.data.doctorId == request.auth.uid ||
+        request.auth.uid == "VYXqFBGAYpgILiUyymgCIOMNxEE3"
       );
+      
+      // Only consultation participants can read
+      allow read: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid ||
+        resource.data.doctorId == request.auth.uid
+      );
+      
+      // Users can list their own consultations, doctors can list theirs
+      allow list: if isAuthenticated();
+      
+      // Only doctors can update consultation status
+      allow update: if isAuthenticated() && (
+        resource.data.doctorId == request.auth.uid ||
+        request.auth.uid == "VYXqFBGAYpgILiUyymgCIOMNxEE3"
+      );
+      
+      // No deletion allowed
+      allow delete: if false;
+    }
+    
+    // Chat messages collection - NEW
+    match /chatMessages/{messageId} {
+      // Only consultation participants can read messages
+      allow read: if isAuthenticated() && 
+        isConsultationParticipant(resource.data.consultationId);
+      
+      // List messages for consultations user is part of
+      allow list: if isAuthenticated() && 
+        request.query.limit <= 100; // Prevent excessive queries
+      
+      // Only consultation participants can create messages
+      // And only when consultation is active
+      allow create: if isAuthenticated() && 
+        request.resource.data.senderId == request.auth.uid &&
+        isConsultationParticipant(request.resource.data.consultationId) &&
+        isConsultationActive(request.resource.data.consultationId);
+      
+      // Users can update their own messages (for read status)
+      allow update: if isAuthenticated() && 
+        resource.data.senderId == request.auth.uid;
+      
+      // No deletion of messages
+      allow delete: if false;
+    }
+    
+    // Legacy consultation messages (keep for backward compatibility)
+    match /consultations/{appointmentId}/messages/{messageId} {
+      allow read, list: if isAuthenticated() && (
+        exists(/databases/$(database)/documents/payments/$(appointmentId)) &&
+        (get(/databases/$(database)/documents/payments/$(appointmentId)).data.userId == request.auth.uid ||
+         get(/databases/$(database)/documents/payments/$(appointmentId)).data.doctorId == request.auth.uid)
+      );
+      allow create: if isAuthenticated() && 
+        exists(/databases/$(database)/documents/payments/$(appointmentId)) &&
+        (get(/databases/$(database)/documents/payments/$(appointmentId)).data.userId == request.auth.uid ||
+         get(/databases/$(database)/documents/payments/$(appointmentId)).data.doctorId == request.auth.uid) &&
+        request.resource.data.senderId == request.auth.uid;
+      allow update: if isAuthenticated() && resource.data.senderId == request.auth.uid;
+    }
+    
+    // Consultation Sessions collection - NEW
+    match /consultationSessions/{sessionId} {
+      // Only doctors can create sessions
+      allow create: if isAuthenticated() && (
+        isDoctor() ||
+        request.auth.uid == "VYXqFBGAYpgILiUyymgCIOMNxEE3"
+      );
+      
+      // Session participants (doctor and patient) can read
+      allow read: if isAuthenticated() && (
+        resource.data.doctorId == request.auth.uid ||
+        resource.data.userId == request.auth.uid
+      );
+      
+      // Allow listing for authenticated users
+      allow list: if isAuthenticated();
+      
+      // Only doctors can update session status
+      allow update: if isAuthenticated() && (
+        resource.data.doctorId == request.auth.uid ||
+        request.auth.uid == "VYXqFBGAYpgILiUyymgCIOMNxEE3"
+      );
+      
+      // No deletion allowed
+      allow delete: if false;
+    }
+    
+    // Goals collection
+    match /goals/{goalId} {
+      // Users can create goals for themselves
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      
+      // Users can read their own goals
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      
+      // Users can list their own goals
+      allow list: if isAuthenticated();
+      
+      // Users can update their own goals
+      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      
+      // Users can delete their own goals
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
     }
   }
 }

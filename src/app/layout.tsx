@@ -11,6 +11,16 @@ const jakartaSans = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "Tenang Jiwa - Mental Health Support",
   description: "Platform dukungan kesehatan mental untuk membantu mengenali dan mengelola perasaan jiwa",
+  icons: {
+    icon: [
+      {
+        url: '/TenangJiwa.svg',
+        type: 'image/svg+xml',
+      }
+    ],
+    shortcut: '/TenangJiwa.svg',
+    apple: '/TenangJiwa.svg',
+  },
 };
 
 export default function RootLayout({

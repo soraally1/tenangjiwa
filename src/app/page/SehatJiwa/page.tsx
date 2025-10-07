@@ -7,7 +7,6 @@ import {
   Star,
   Flame,
   CheckCircle,
-  Plus,
   Edit3,
   Trash2,
   Heart,
@@ -19,22 +18,11 @@ import {
   BookOpen
 } from 'lucide-react'
 import Navbar from '@/app/component/navbar'
+import { auth } from '@/app/service/firebase'
+import { onAuthStateChanged } from 'firebase/auth'
+import { loadUserGoals, updateGoalProgress, deleteGoal, calculateUserStats, type Goal } from '@/app/service/goalService'
 
-// Types
-interface Goal {
-  id: string
-  title: string
-  description: string
-  category: 'mental-health' | 'productivity' | 'wellness' | 'learning' | 'social' | 'personal'
-  targetValue: number
-  currentValue: number
-  unit: string
-  deadline: Date
-  priority: 'low' | 'medium' | 'high'
-  status: 'active' | 'completed' | 'paused' | 'cancelled'
-  createdAt: Date
-  completedAt?: Date
-}
+// Types imported from goalService
 
 interface Achievement {
   id: string
@@ -92,12 +80,48 @@ export default function TargetPage() {
     monthlyProgress: [120, 135, 128, 145, 152, 138, 142, 155, 148, 162, 158, 165]
   })
   const [viewMode, setViewMode] = useState<'goals' | 'achievements' | 'stats'>('goals')
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  // Sample data
+  // Load goals from Firebase
   useEffect(() => {
-    const sampleGoals: Goal[] = [
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setCurrentUserId(user.uid)
+        await loadGoalsFromFirebase(user.uid)
+      } else {
+        setCurrentUserId(null)
+        setGoals([])
+      }
+      setLoading(false)
+    })
+
+    return () => unsubscribe()
+  }, [])
+
+  const loadGoalsFromFirebase = async (userId: string) => {
+    try {
+      const loadedGoals = await loadUserGoals(userId)
+      setGoals(loadedGoals)
+      
+      // Update stats using the service
+      const stats = await calculateUserStats(userId)
+      setUserStats(prev => ({
+        ...prev,
+        ...stats
+      }))
+    } catch (error) {
+      console.error('Error loading goals:', error)
+    }
+  }
+
+  // Keep sample data as fallback
+  useEffect(() => {
+    if (!currentUserId && !loading) {
+      const sampleGoals: Goal[] = [
       {
         id: '1',
+        userId: 'sample-user',
         title: 'Meditasi Harian',
         description: 'Melakukan meditasi 10 menit setiap hari untuk kesehatan mental',
         category: 'mental-health',
@@ -111,6 +135,7 @@ export default function TargetPage() {
       },
       {
         id: '2',
+        userId: 'sample-user',
         title: 'Olahraga Rutin',
         description: 'Berolahraga 3 kali seminggu untuk menjaga kebugaran',
         category: 'wellness',
@@ -124,6 +149,7 @@ export default function TargetPage() {
       },
       {
         id: '3',
+        userId: 'sample-user',
         title: 'Membaca Buku',
         description: 'Menyelesaikan 5 buku dalam sebulan',
         category: 'learning',
@@ -168,9 +194,10 @@ export default function TargetPage() {
       }
     ]
 
-    setGoals(sampleGoals)
-    setUserStats(prev => ({ ...prev, achievements: sampleAchievements }))
-  }, [])
+      setGoals(sampleGoals)
+      setUserStats(prev => ({ ...prev, achievements: sampleAchievements }))
+    }
+  }, [currentUserId, loading])
 
   const getProgressPercentage = (goal: Goal) => {
     return Math.min((goal.currentValue / goal.targetValue) * 100, 100)
@@ -190,14 +217,13 @@ export default function TargetPage() {
   }
 
 
-  const updateGoalProgress = (goalId: string, newValue: number) => {
-    setGoals(prev => prev.map(goal => {
-      if (goal.id === goalId) {
-        const updatedGoal = { ...goal, currentValue: newValue }
-        if (newValue >= goal.targetValue && goal.status === 'active') {
-          updatedGoal.status = 'completed'
-          updatedGoal.completedAt = new Date()
-          // Award points
+  const handleUpdateGoalProgress = async (goalId: string, newValue: number) => {
+    try {
+      const result = await updateGoalProgress(goalId, newValue)
+      
+      if (result.success) {
+        if (result.completed) {
+          // Award points for completion
           setUserStats(prevStats => ({
             ...prevStats,
             totalPoints: prevStats.totalPoints + 100,
@@ -205,14 +231,38 @@ export default function TargetPage() {
             activeGoals: prevStats.activeGoals - 1
           }))
         }
-        return updatedGoal
+        
+        // Reload goals from Firebase
+        if (currentUserId) {
+          await loadGoalsFromFirebase(currentUserId)
+        }
+      } else {
+        alert(`Gagal mengupdate goal: ${result.error}`)
       }
-      return goal
-    }))
+    } catch (error) {
+      console.error('Error updating goal:', error)
+      alert('Gagal mengupdate goal')
+    }
   }
 
-  const deleteGoal = (goalId: string) => {
-    setGoals(prev => prev.filter(goal => goal.id !== goalId))
+  const handleDeleteGoal = async (goalId: string) => {
+    if (!confirm('Apakah Anda yakin ingin menghapus goal ini?')) return
+    
+    try {
+      const result = await deleteGoal(goalId)
+      
+      if (result.success) {
+        // Reload goals from Firebase
+        if (currentUserId) {
+          await loadGoalsFromFirebase(currentUserId)
+        }
+      } else {
+        alert(`Gagal menghapus goal: ${result.error}`)
+      }
+    } catch (error) {
+      console.error('Error deleting goal:', error)
+      alert('Gagal menghapus goal')
+    }
   }
 
   // Animation variants
@@ -273,14 +323,14 @@ export default function TargetPage() {
             </motion.div>
 
             <h1 className="text-5xl md:text-6xl font-bold text-[#1E498E] mb-6 leading-tight">
-              Raih Target
+              Yuk Rubah Diri Kamu
               <span className="block bg-gradient-to-r from-[#1E498E] to-[#3B82F6] bg-clip-text text-transparent">
-                Impian Anda
+                Agar Dapat Menjadi Lebih Baik!
               </span>
             </h1>
 
             <p className="text-xl text-[#1E498E]/70 max-w-3xl mx-auto leading-relaxed">
-              Kelola target dan pencapaian dengan sistem gamifikasi yang menyenangkan. 
+              Kelola target kesehatan kamu dan pencapaian dengan sistem gamifikasi yang menyenangkan. 
               Dapatkan poin, badge, dan tingkatkan level Anda!
             </p>
           </motion.div>
@@ -384,17 +434,6 @@ export default function TargetPage() {
                 exit={{ opacity: 0, y: -20 }}
                 className="space-y-6"
               >
-                {/* Add Goal Button */}
-                <motion.button
-                  onClick={() => {/* TODO: Implement add goal functionality */}}
-                  className="w-full bg-gradient-to-r from-[#1E498E] to-[#3B82F6] text-white py-4 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Plus className="w-5 h-5 inline mr-2" />
-                  Tambah Goal Baru
-                </motion.button>
-
                 {/* Goals List */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {goals.map((goal, index) => (
@@ -447,7 +486,7 @@ export default function TargetPage() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <motion.button
-                            onClick={() => updateGoalProgress(goal.id, Math.min(goal.currentValue + 1, goal.targetValue))}
+                            onClick={() => handleUpdateGoalProgress(goal.id, Math.min(goal.currentValue + 1, goal.targetValue))}
                             className="bg-green-500 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-green-600 transition-colors"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
@@ -463,7 +502,7 @@ export default function TargetPage() {
                             <Edit3 className="w-4 h-4" />
                           </motion.button>
                           <motion.button
-                            onClick={() => deleteGoal(goal.id)}
+                            onClick={() => handleDeleteGoal(goal.id)}
                             className="bg-red-500 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-red-600 transition-colors"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}

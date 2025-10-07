@@ -3,11 +3,39 @@ import {
   signInWithPopup, 
   signOut,
   User,
-  UserCredential 
+  UserCredential,
+  onAuthStateChanged
 } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, googleProvider, db } from './firebase';
+
+// Track auth initialization state
+let authInitialized = false;
+let authInitializing = false;
+const authInitPromises: ((value: void) => void)[] = [];
+
+// Wait for Firebase Auth to initialize
+export const waitForAuthInit = (): Promise<void> => {
+  if (authInitialized) {
+    return Promise.resolve();
+  }
+  
+  if (!authInitializing) {
+    authInitializing = true;
+    onAuthStateChanged(auth, () => {
+      authInitialized = true;
+      authInitializing = false;
+      // Resolve all pending promises
+      authInitPromises.forEach(resolve => resolve());
+      authInitPromises.length = 0;
+    });
+  }
+  
+  return new Promise((resolve) => {
+    authInitPromises.push(resolve);
+  });
+};
 
 export interface LoginResult {
   success: boolean;
@@ -191,12 +219,24 @@ export const logout = async (): Promise<LogoutResult> => {
   }
 };
 
-// Get current user
+// Get current user (sync - may return null during initialization)
 export const getCurrentUser = (): User | null => {
+  return auth.currentUser;
+};
+
+// Get current user (async - waits for auth to initialize)
+export const getCurrentUserAsync = async (): Promise<User | null> => {
+  await waitForAuthInit();
   return auth.currentUser;
 };
 
 // Check if user is authenticated
 export const isAuthenticated = (): boolean => {
+  return !!auth.currentUser;
+};
+
+// Check if user is authenticated (async - waits for auth to initialize)
+export const isAuthenticatedAsync = async (): Promise<boolean> => {
+  await waitForAuthInit();
   return !!auth.currentUser;
 };

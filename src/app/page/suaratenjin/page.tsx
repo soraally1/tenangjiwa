@@ -1,7 +1,7 @@
 "use client"
 
 import { motion, AnimatePresence } from "framer-motion"
-import { Mic, MicOff, Play, Pause, Brain, Sparkles, Activity, Eye, Clock } from "lucide-react"
+import { Mic, MicOff, Pause, Brain, Sparkles, Activity, Eye, Clock } from "lucide-react"
 import { useState, useRef, useEffect } from "react"
 import Image from "next/image"
 import Navbar from "../../component/navbar"

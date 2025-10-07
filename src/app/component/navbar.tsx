@@ -4,8 +4,11 @@ import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { getCurrentUser, isAuthenticated } from '../service/loginservice';
+import { getCurrentUserAsync, isAuthenticatedAsync } from '../service/loginservice';
 import { User } from 'firebase/auth';
+import { db } from '../service/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { Brain, Mic, MessageCircle } from 'lucide-react';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -13,6 +16,7 @@ export default function Navbar() {
   const [showSiTenangMenu, setShowSiTenangMenu] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
+  const [isDoctor, setIsDoctor] = useState(false);
   const pathname = usePathname();
   const accountMenuRef = useRef<HTMLDivElement>(null);
   const siTenangMenuRef = useRef<HTMLDivElement>(null);
@@ -39,18 +43,34 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    // Check authentication status
-    const checkAuth = () => {
-      const currentUser = getCurrentUser();
-      const authenticated = isAuthenticated();
+    // Check authentication status and doctor status
+    const checkAuth = async () => {
+      const currentUser = await getCurrentUserAsync();
+      const authenticated = await isAuthenticatedAsync();
       setUser(currentUser);
       setIsUserAuthenticated(authenticated);
+      
+      // Check if user is a doctor
+      if (currentUser?.uid) {
+        try {
+          const userDocRef = doc(db, 'users', currentUser.uid);
+          const userDoc = await getDoc(userDocRef);
+          if (userDoc.exists()) {
+            setIsDoctor(userDoc.data().isDoctor === true);
+          }
+        } catch (error) {
+          console.error('Error checking doctor status:', error);
+          setIsDoctor(false);
+        }
+      } else {
+        setIsDoctor(false);
+      }
     };
 
     checkAuth();
 
     // Listen for auth state changes
-    const interval = setInterval(checkAuth, 1000);
+    const interval = setInterval(checkAuth, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -59,9 +79,9 @@ export default function Navbar() {
   ];
 
   const siTenangItems = [
-    { href: '/page/aipage', label: 'Deteksi AI', icon: '🤖' },
-    { href: '/page/suaratenjin', label: 'Suara TenJin', icon: '🎤' },
-    { href: '/page/ceritatenjin', label: 'Cerita TenJin', icon: '💬' },
+    { href: '/page/mental-assessment', label: 'Deteksi TenJin', icon: <Brain className="w-4 h-4" /> },
+    { href: '/page/suaratenjin', label: 'Suara TenJin', icon: <Mic className="w-4 h-4" /> },
+    { href: '/page/ceritatenjin', label: 'Cerita TenJin', icon: <MessageCircle className="w-4 h-4" /> },
   ];
 
   return (
@@ -120,7 +140,7 @@ export default function Navbar() {
                     }`}
                   >
                     <div className="flex items-center gap-2">
-                      <span className="text-lg">{item.icon}</span>
+                      {item.icon}
                       <span>{item.label}</span>
                     </div>
                   </Link>
@@ -182,19 +202,20 @@ export default function Navbar() {
                         Profil Saya
                       </div>
                     </Link>
-                    <Link
-                      href="/page/settings"
-                      onClick={() => setShowAccountMenu(false)}
-                      className="block px-4 py-2 text-sm text-black/70 hover:text-[#1E498E] hover:bg-[#1E498E]/10 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        Pengaturan
-                      </div>
-                    </Link>
+                    {isDoctor && (
+                      <Link
+                        href="/doctor"
+                        onClick={() => setShowAccountMenu(false)}
+                        className="block px-4 py-2 text-sm text-black/70 hover:text-[#1E498E] hover:bg-[#1E498E]/10 transition-colors"
+                      >
+                        <div className="flex items-center gap-2">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                          </svg>
+                          Page Dokter
+                        </div>
+                      </Link>
+                    )}
                     <div className="border-t border-gray-200 my-1"></div>
                     <button
                       onClick={() => {
@@ -282,7 +303,7 @@ export default function Navbar() {
                     }`}
                   >
                     <div className="flex items-center gap-2">
-                      <span className="text-base">{item.icon}</span>
+                      {item.icon}
                       <span>{item.label}</span>
                     </div>
                   </Link>

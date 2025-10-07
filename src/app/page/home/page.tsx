@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Smile, Star as StarIcon, Hospital, Pill, FileText, Bot, Zap, Lock, Lightbulb, Brain, Mic, PenTool } from 'lucide-react';
 import depresiImg from '../../../../public/mood/Depresi.png';
 import kecanduanImg from '../../../../public/mood/Kecanduan.png';
 import moodswingImg from '../../../../public/mood/MoodSwing.png';
@@ -24,7 +25,7 @@ const conditions: Condition[] = [
     id: 1,
     name: 'Depresi',
     image: depresiImg.src,
-    description: 'Depresi adalah kondisi mental yang serius namun dapat diobati. Jika kamu merasa kehilangan minat, kesulitan tidur, atau memiliki pikiran negatif selama lebih dari 2 minggu, jangan ragu untuk mencari bantuan. Kamu tidak sendirian dalam menghadapi ini. 💙',
+    description: 'Depresi adalah kondisi mental yang serius namun dapat diobati. Jika kamu merasa kehilangan minat, kesulitan tidur, atau memiliki pikiran negatif selama lebih dari 2 minggu, jangan ragu untuk mencari bantuan. Kamu tidak sendirian dalam menghadapi ini.',
     symptoms: ['Perasaan sedih berkepanjangan', 'Kehilangan minat', 'Gangguan tidur', 'Pikiran negatif', 'Kelelahan mental']
   },
   {
@@ -38,21 +39,21 @@ const conditions: Condition[] = [
     id: 3,
     name: 'Moodswing',
     image: moodswingImg.src,
-    description: 'Moodswing atau perubahan suasana hati yang drastis bisa mempengaruhi kehidupan sehari-hari. Penting untuk mengenali pola perubahan mood dan mencari cara sehat untuk mengelolanya. 🎭',
+    description: 'Moodswing atau perubahan suasana hati yang drastis bisa mempengaruhi kehidupan sehari-hari. Penting untuk mengenali pola perubahan mood dan mencari cara sehat untuk mengelolanya.',
     symptoms: ['Perubahan emosi tiba-tiba', 'Sensitifitas tinggi', 'Energi naik-turun', 'Perubahan perilaku', 'Kesulitan mengontrol emosi']
   },
   {
     id: 4,
     name: 'Trauma',
     image: traumaImg.src,
-    description: 'Trauma adalah bekas luka emosional yang dapat mempengaruhi kesehatan mental jangka panjang. Dengan dukungan yang tepat dan penanganan profesional, pemulihan dari trauma adalah sesuatu yang mungkin. 🌅',
+    description: 'Trauma adalah bekas luka emosional yang dapat mempengaruhi kesehatan mental jangka panjang. Dengan dukungan yang tepat dan penanganan profesional, pemulihan dari trauma adalah sesuatu yang mungkin.',
     symptoms: ['Flashback kejadian', 'Mimpi buruk', 'Kecemasan berlebih', 'Menghindari tempat/situasi tertentu', 'Kesulitan percaya']
   },
   {
     id: 5,
     name: 'Kecanduan',
     image: kecanduanImg.src,
-    description: 'Kecanduan adalah kondisi kompleks yang mempengaruhi otak dan perilaku. Meski sulit, dengan tekad dan bantuan profesional, kecanduan dapat diatasi. Langkah pertama adalah mengakui dan mencari bantuan. 🌟',
+    description: 'Kecanduan adalah kondisi kompleks yang mempengaruhi otak dan perilaku. Meski sulit, dengan tekad dan bantuan profesional, kecanduan dapat diatasi. Langkah pertama adalah mengakui dan mencari bantuan.',
     symptoms: ['Kehilangan kontrol', 'Perubahan prioritas', 'Gejala putus zat', 'Pengabaian tanggung jawab', 'Isolasi sosial']
   },
 ];
@@ -60,19 +61,28 @@ const conditions: Condition[] = [
 export default function HomePage() {
   const [selectedCondition, setSelectedCondition] = useState<string | null>(null);
   const [particles, setParticles] = useState<Array<{ top: number; left: number; duration: number; delay: number }>>([]);
+  const [secondaryParticles, setSecondaryParticles] = useState<Array<{ left: number; top: number; duration: number }>>([]);
   const [isClient, setIsClient] = useState(false);
   const [showStoryModal, setShowStoryModal] = useState(false);
   const detailsRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     // Generate particles only on client side to avoid hydration mismatch
-    const generatedParticles = [...Array(20)].map(() => ({
-      top: Math.random() * 100,
-      left: Math.random() * 100,
-      duration: 3 + Math.random() * 2,
-      delay: Math.random() * 2,
+    const generatedParticles = [...Array(20)].map((_, i) => ({
+      top: (i * 37 + 23) % 100, // Deterministic positioning
+      left: (i * 47 + 17) % 100,
+      duration: 3 + (i % 3),
+      delay: (i % 4) * 0.5,
     }));
+    
+    const generatedSecondaryParticles = [...Array(20)].map((_, i) => ({
+      left: (i * 53 + 31) % 100,
+      top: (i * 41 + 19) % 100,
+      duration: (i % 5) + 10,
+    }));
+    
     setParticles(generatedParticles);
+    setSecondaryParticles(generatedSecondaryParticles);
     setIsClient(true);
   }, []);
 
@@ -157,8 +167,8 @@ export default function HomePage() {
                     transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY }}
                   />
                 </motion.h2>
-                <motion.p className="text-xl md:text-2xl text-[#1E498E] mb-12 relative " variants={fadeUp}>
-                  Kenali perasaan jiwa kamu yuk! 😉
+                <motion.p className="text-xl md:text-2xl text-[#1E498E] mb-12 relative flex items-center gap-2" variants={fadeUp}>
+                  Kenali perasaan jiwa kamu yuk! <Smile className="w-6 h-6 inline" />
                   <motion.span
                     className="absolute -left-4 -top-4 w-20 h-20 bg-pink-500/10 rounded-full blur-xl"
                     animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
@@ -301,7 +311,7 @@ export default function HomePage() {
 
     <section className="relative py-20 overflow-hidden min-h-screen max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
       <div className="absolute inset-0 overflow-hidden">
-        {[...Array(20)].map((_, i) => (
+        {isClient && secondaryParticles.map((particle, i) => (
           <motion.div
             key={i}
             className="absolute w-2 h-2 bg-white/20 rounded-full"
@@ -311,13 +321,13 @@ export default function HomePage() {
               opacity: [0.3, 0.8, 0.3],
             }}
             transition={{
-              duration: Math.random() * 10 + 10,
+              duration: particle.duration,
               repeat: Number.POSITIVE_INFINITY,
               ease: "easeInOut",
             }}
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
+              left: `${particle.left}%`,
+              top: `${particle.top}%`,
             }}
           />
         ))}
@@ -389,10 +399,10 @@ export default function HomePage() {
                 className="space-y-4"
               >
                 {[
-                  { icon: "⭐", text: "Rating 4.9/5 dari 1000+ pasien" },
-                  { icon: "🏥", text: "Tersedia 24/7 untuk konsultasi darurat" },
-                  { icon: "💊", text: "Dapat meresepkan obat jika diperlukan" },
-                  { icon: "📋", text: "Riwayat konsultasi tersimpan aman" },
+                  { icon: <StarIcon className="w-6 h-6" />, text: "Rating 4.9/5 dari 1000+ pasien" },
+                  { icon: <Hospital className="w-6 h-6" />, text: "Tersedia 24/7 untuk konsultasi darurat" },
+                  { icon: <Pill className="w-6 h-6" />, text: "Dapat meresepkan obat jika diperlukan" },
+                  { icon: <FileText className="w-6 h-6" />, text: "Riwayat konsultasi tersimpan aman" },
                 ].map((item, index) => (
                   <motion.div
                     key={index}
@@ -402,7 +412,7 @@ export default function HomePage() {
                     transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
                     className="flex items-center gap-3"
                   >
-                    <span className="text-2xl">{item.icon}</span>
+                    <span className="text-[#1E498E]">{item.icon}</span>
                     <span className="text-[#1E498E]/80">{item.text}</span>
                   </motion.div>
                 ))}
@@ -478,10 +488,10 @@ export default function HomePage() {
                 className="space-y-4"
               >
                 {[
-                  { icon: "🤖", text: "Tersedia 24/7 tanpa antrian" },
-                  { icon: "⚡", text: "Respons instan dalam hitungan detik" },
-                  { icon: "🔒", text: "Privasi terjamin dan anonim" },
-                  { icon: "💡", text: "Rekomendasi berdasarkan riset terkini" },
+                  { icon: <Bot className="w-6 h-6" />, text: "Tersedia 24/7 tanpa antrian" },
+                  { icon: <Zap className="w-6 h-6" />, text: "Respons instan dalam hitungan detik" },
+                  { icon: <Lock className="w-6 h-6" />, text: "Privasi terjamin dan anonim" },
+                  { icon: <Lightbulb className="w-6 h-6" />, text: "Rekomendasi berdasarkan riset terkini" },
                 ].map((item, index) => (
                   <motion.div
                     key={index}
@@ -491,7 +501,7 @@ export default function HomePage() {
                     transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
                     className="flex items-center gap-3"
                   >
-                    <span className="text-2xl">{item.icon}</span>
+                    <span className="text-pink-600">{item.icon}</span>
                     <span className="text-[#1E498E]/80">{item.text}</span>
                   </motion.div>
                 ))}
@@ -524,18 +534,23 @@ export default function HomePage() {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="mt-20 text-center"
         >
-          <div className="bg-white/30 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-            <h3 className="text-2xl font-bold text-[#1E498E] mb-4">Tidak yakin mana yang tepat untuk Anda?</h3>
+          <div className="bg-gradient-to-r backdrop-blur-sm rounded-2xl p-8 border border-white/40">
+            <div className="mb-4 flex justify-center">
+              <Brain className="w-16 h-16 text-[#1E498E]" />
+            </div>
+            <h3 className="text-2xl font-bold text-[#1E498E] mb-4">Cek Kesehatan Mental Anda</h3>
             <p className="text-[#1E498E]/80 mb-6">
-              Mulai dengan AI Assistant untuk penilaian awal, lalu lanjutkan ke psikiater jika diperlukan
+              Asesmen AI dengan 5 pertanyaan untuk menganalisis kondisi kesehatan mental Anda dan memberikan rekomendasi yang tepat
             </p>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-[#1E498E] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#1E498E]/90 transition-colors duration-300"
-            >
-              Mulai Assessment
-            </motion.button>
+            <Link href="/page/mental-assessment">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-gradient-to-r bg-[#1E498E] text-white px-8 py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300"
+              >
+                Mulai Asesmen Gratis
+              </motion.button>
+            </Link>
           </div>
         </motion.div>
       </div>
@@ -572,7 +587,9 @@ export default function HomePage() {
                   whileTap={{ scale: 0.95 }}
                   className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl p-8 text-white cursor-pointer shadow-lg hover:shadow-2xl transition-shadow"
                 >
-                  <div className="text-5xl mb-4">🎤</div>
+                  <div className="mb-4 flex justify-center">
+                    <Mic className="w-12 h-12" />
+                  </div>
                   <h4 className="text-2xl font-bold mb-3">Cerita Suara</h4>
                   <p className="text-white/90 mb-4">
                     Berbicara langsung dengan TenJin menggunakan suara kamu
@@ -592,7 +609,9 @@ export default function HomePage() {
                   whileTap={{ scale: 0.95 }}
                   className="bg-gradient-to-br from-[#1E498E] to-blue-600 rounded-2xl p-8 text-white cursor-pointer shadow-lg hover:shadow-2xl transition-shadow"
                 >
-                  <div className="text-5xl mb-4">✍️</div>
+                  <div className="mb-4 flex justify-center">
+                    <PenTool className="w-12 h-12" />
+                  </div>
                   <h4 className="text-2xl font-bold mb-3">Cerita Ketik</h4>
                   <p className="text-white/90 mb-4">
                     Tulis dan berbagi cerita kamu dengan mengetik
