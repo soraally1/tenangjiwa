@@ -368,7 +368,7 @@ export default function HomePage() {
                   alt="Professional Psychiatrist"
                   width={600}
                   height={400}
-                  className="w-full h-[400px] object-cover rounded-2xl shadow-2xl relative z-10"
+                  className="w-full h-[300px] sm:h-[350px] md:h-[400px] object-cover rounded-2xl shadow-2xl relative z-10"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#FFF3E0]/80 via-transparent to-transparent rounded-2xl z-20"></div>
               </motion.div>

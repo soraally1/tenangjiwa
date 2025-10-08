@@ -141,7 +141,7 @@ export default function BookingHistory() {
         onClick={() => setIsOpen(!isOpen)}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="fixed bottom-8 right-8 z-50 bg-gradient-to-r from-[#1E498E] to-[#3B82F6] text-white p-4 rounded-full shadow-2xl"
+        className="fixed bottom-8 right-8 z-50 bg-gradient-to-r from-[#1E498E] to-[#3B82F6] text-white p-4 rounded-full shadow-2xl mb-12 md:mb-0"
       >
         <Calendar className="w-6 h-6" />
       </motion.button>

@@ -609,7 +609,7 @@ export default function MentalAssessmentPage() {
               disabled={userStory.length < 50}
               whileHover={userStory.length >= 50 ? { scale: 1.05 } : {}}
               whileTap={userStory.length >= 50 ? { scale: 0.95 } : {}}
-              className={`w-full py-4 rounded-xl font-semibold text-lg transition-all shadow-lg ${
+              className={`w-full py-4 rounded-xl font-semibold text-lg transition-all shadow-lg mb-12 ${
                 userStory.length >= 50
                   ? 'bg-[#1E498E] hover:bg-[#1E498E]/90 text-white'
                   : 'bg-gray-400 text-gray-200 cursor-not-allowed'
@@ -675,7 +675,7 @@ export default function MentalAssessmentPage() {
                 <div className="bg-[#1E498E] text-white w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0 shadow-lg">
                   {currentQuestion + 1}
                 </div>
-                <h2 className="text-2xl font-bold text-[#1E498E] leading-tight">
+                <h2 className=" text-xl md:text-2xl  font-bold text-[#1E498E] leading-tight">
                   {questions[currentQuestion].text}
                 </h2>
               </div>
@@ -687,7 +687,7 @@ export default function MentalAssessmentPage() {
                     onClick={() => handleAnswer(option.value)}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className={`w-full p-5 rounded-2xl text-left font-semibold transition-all ${
+                    className={`w-full p-5 rounded-2xl text-left text font-semibold transition-all ${
                       answers[questions[currentQuestion].id] === option.value
                         ? 'bg-[#1E498E] text-white shadow-lg'
                         : 'bg-white/40 backdrop-blur-sm text-[#1E498E] border border-white/50 hover:shadow-lg'
@@ -707,7 +707,7 @@ export default function MentalAssessmentPage() {
                 onClick={() => setCurrentQuestion(currentQuestion - 1)}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex-1 border-2 border-[#1E498E] text-[#1E498E] hover:bg-[#1E498E]/10 bg-white/50 backdrop-blur-sm py-4 rounded-xl font-semibold transition-colors"
+                className="flex-1 border-2 border-[#1E498E] text-[#1E498E] hover:bg-[#1E498E]/10 bg-white/50 backdrop-blur-sm py-4 rounded-xl font-semibold transition-colors mb-14"
               >
                 Sebelumnya
               </motion.button>
@@ -718,7 +718,7 @@ export default function MentalAssessmentPage() {
                 onClick={handleSubmit}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex-1 bg-[#1E498E] hover:bg-[#1E498E]/90 text-white py-4 rounded-xl font-semibold shadow-lg transition-colors"
+                className="flex-1 bg-[#1E498E] hover:bg-[#1E498E]/90 text-white py-4 rounded-xl font-semibold shadow-lg transition-colors mb-14"
               >
                 Lihat Hasil Analisis
               </motion.button>

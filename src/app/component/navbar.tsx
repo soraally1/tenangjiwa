@@ -79,9 +79,9 @@ export default function Navbar() {
   ];
 
   const siTenangItems = [
-    { href: '/page/mental-assessment', label: 'Deteksi TenJin', icon: <Brain className="w-4 h-4" /> },
-    { href: '/page/suaratenjin', label: 'Suara TenJin', icon: <Mic className="w-4 h-4" /> },
-    { href: '/page/ceritatenjin', label: 'Cerita TenJin', icon: <MessageCircle className="w-4 h-4" /> },
+    { href: '/page/mental-assessment', label: 'Deteksi TenJin', icon: <Brain className="w-4 h-4 text-[#1E498E] z-50" /> },
+    { href: '/page/suaratenjin', label: 'Suara TenJin', icon: <Mic className="w-4 h-4 text-[#1E498E] z-50" /> },
+    { href: '/page/ceritatenjin', label: 'Cerita TenJin', icon: <MessageCircle className="w-4 h-4 text-[#1E498E] z-50" /> },
   ];
 
   return (
@@ -127,19 +127,21 @@ export default function Navbar() {
             </button>
             
             {showSiTenangMenu && (
-              <div className="absolute left-0 mt-2 w-56 bg-white/90 backdrop-blur-md rounded-xl border border-black/10 shadow-lg py-2 z-50">
+              <div className="absolute left-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-2xl py-2 z-[9999] pointer-events-auto">
                 {siTenangItems.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
-                    onClick={() => setShowSiTenangMenu(false)}
-                    className={`block px-4 py-2 text-sm transition-colors ${
+                    onClick={(e) => {
+                      setShowSiTenangMenu(false);
+                    }}
+                    className={`block px-4 py-3 text-sm transition-colors cursor-pointer ${
                       pathname === item.href
                         ? 'text-[#1E498E] bg-[#1E498E]/10 font-medium'
                         : 'text-black/70 hover:text-[#1E498E] hover:bg-[#1E498E]/10'
                     }`}
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 pointer-events-none">
                       {item.icon}
                       <span>{item.label}</span>
                     </div>
@@ -280,26 +282,28 @@ export default function Navbar() {
             </svg>
             <span className="text-xs mt-0.5">Beranda</span>
           </Link>
-          <button 
-            onClick={() => setShowSiTenangMenu(!showSiTenangMenu)}
-            className={`flex flex-col items-center justify-center py-2 rounded-xl relative ${siTenangItems.some(item => pathname === item.href) ? 'text-[#1E498E] bg-[#1E498E]/10' : 'text-black/70'}`}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-              <path d="M4.5 6.75A2.25 2.25 0 016.75 4.5h10.5A2.25 2.25 0 0119.5 6.75v10.5A2.25 2.25 0 0117.25 19.5H6.75A2.25 2.25 0 014.5 17.25V6.75zm3 1.5a.75.75 0 000 1.5h9a.75.75 0 000-1.5h-9zm0 3a.75.75 0 000 1.5h9a.75.75 0 000-1.5h-9zm0 3a.75.75 0 000 1.5h5.25a.75.75 0 000-1.5H7.5z" />
-            </svg>
-            <span className="text-xs mt-0.5">SiTenang</span>
+          <div className="relative">
+            <button 
+              onClick={() => setShowSiTenangMenu(!showSiTenangMenu)}
+              className={`flex flex-col items-center justify-center py-2 rounded-xl w-full ${siTenangItems.some(item => pathname === item.href) ? 'text-[#1E498E] bg-[#1E498E]/10' : 'text-black/70'}`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                <path d="M4.5 6.75A2.25 2.25 0 016.75 4.5h10.5A2.25 2.25 0 0119.5 6.75v10.5A2.25 2.25 0 0117.25 19.5H6.75A2.25 2.25 0 014.5 17.25V6.75zm3 1.5a.75.75 0 000 1.5h9a.75.75 0 000-1.5h-9zm0 3a.75.75 0 000 1.5h9a.75.75 0 000-1.5h-9zm0 3a.75.75 0 000 1.5h5.25a.75.75 0 000-1.5H7.5z" />
+              </svg>
+              <span className="text-xs mt-0.5">SiTenang</span>
+            </button>
             
             {showSiTenangMenu && (
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-white/95 backdrop-blur-md rounded-xl border border-black/10 shadow-lg py-2">
+              <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-56 bg-white backdrop-blur-md rounded-xl border border-black/10 shadow-2xl py-2 z-[999]">
                 {siTenangItems.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
                     onClick={() => setShowSiTenangMenu(false)}
-                    className={`block px-4 py-2 text-sm transition-colors ${
+                    className={`block px-4 py-3 text-sm transition-colors z-[9999] ${
                       pathname === item.href
                         ? 'text-[#1E498E] bg-[#1E498E]/10 font-medium'
-                        : 'text-black/70'
+                        : 'text-black/70 hover:bg-[#1E498E]/5'
                     }`}
                   >
                     <div className="flex items-center gap-2">
@@ -310,7 +314,7 @@ export default function Navbar() {
                 ))}
               </div>
             )}
-          </button>
+          </div>
           <Link href="/konsultasi" className={`flex flex-col items-center justify-center py-2 rounded-xl ${pathname === '/konsultasi' ? 'text-[#1E498E] bg-[#1E498E]/10' : 'text-black/70'}`}>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
               <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm6.967-2.28a.75.75 0 10-1.06 1.06L11.31 14l4.97-4.97a.75.75 0 00-1.06-1.06L11.31 11.88 9.217 9.72z" clipRule="evenodd" />
