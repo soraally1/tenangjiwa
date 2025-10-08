@@ -305,7 +305,7 @@ export default function TargetPage() {
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
       />
 
-      <div className="pt-20 pb-10">
+      <div className="pt-20 pb-24 sm:pb-10">
         <motion.div 
           className="container mx-auto px-4 max-w-7xl" 
           variants={containerVariants} 
@@ -313,37 +313,37 @@ export default function TargetPage() {
           animate="visible"
         >
           {/* Header Section */}
-          <motion.div className="text-center mb-12" variants={itemVariants}>
+          <motion.div className="text-center mb-8 sm:mb-12" variants={itemVariants}>
             <motion.div
-              className="inline-flex items-center gap-2 bg-white/60 backdrop-blur-sm px-6 py-3 rounded-full mb-6"
+              className="inline-flex items-center gap-2 bg-white/60 backdrop-blur-sm px-4 sm:px-6 py-2 sm:py-3 rounded-full mb-4 sm:mb-6"
               whileHover={{ scale: 1.05 }}
             >
               <Target className="text-[#1E498E] w-5 h-5" />
               <span className="text-[#1E498E] font-semibold">Target & Pencapaian</span>
             </motion.div>
 
-            <h1 className="text-5xl md:text-6xl font-bold text-[#1E498E] mb-6 leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-[#1E498E] mb-4 sm:mb-6 leading-tight">
               Yuk Rubah Diri Kamu
               <span className="block bg-gradient-to-r from-[#1E498E] to-[#3B82F6] bg-clip-text text-transparent">
                 Agar Dapat Menjadi Lebih Baik!
               </span>
             </h1>
 
-            <p className="text-xl text-[#1E498E]/70 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-[#1E498E]/70 max-w-3xl mx-auto leading-relaxed px-4 sm:px-0">
               Kelola target kesehatan kamu dan pencapaian dengan sistem gamifikasi yang menyenangkan. 
               Dapatkan poin, badge, dan tingkatkan level Anda!
             </p>
           </motion.div>
 
           {/* Stats Overview */}
-          <motion.div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12" variants={itemVariants}>
+          <motion.div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-8 sm:mb-12" variants={itemVariants}>
             {/* Level Card */}
-            <div className="bg-white/20 backdrop-blur-xl rounded-3xl border border-white/30 shadow-2xl p-6">
+            <div className="bg-white/20 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-white/30 shadow-2xl p-3 sm:p-6">
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#1E498E] to-[#3B82F6] rounded-full flex items-center justify-center">
-                  <Crown className="w-6 h-6 text-white" />
+                <div className="w-8 h-8 sm:w-12 sm:h-12 bg-gradient-to-br from-[#1E498E] to-[#3B82F6] rounded-full flex items-center justify-center">
+                  <Crown className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                 </div>
-                <span className="text-2xl font-bold text-[#1E498E]">Level {userStats.level}</span>
+                <span className="text-lg sm:text-2xl font-bold text-[#1E498E]">Level {userStats.level}</span>
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm text-[#1E498E]/70">
@@ -363,52 +363,52 @@ export default function TargetPage() {
             </div>
 
             {/* Points Card */}
-            <div className="bg-white/20 backdrop-blur-xl rounded-3xl border border-white/30 shadow-2xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
-                  <Star className="w-6 h-6 text-white" />
+            <div className="bg-white/20 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-white/30 shadow-2xl p-3 sm:p-6">
+              <div className="flex items-center justify-between mb-2 sm:mb-4">
+                <div className="w-8 h-8 sm:w-12 sm:h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+                  <Star className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                 </div>
-                <span className="text-2xl font-bold text-[#1E498E]">{userStats.totalPoints}</span>
+                <span className="text-lg sm:text-2xl font-bold text-[#1E498E]">{userStats.totalPoints}</span>
               </div>
-              <p className="text-[#1E498E]/70 text-sm">Total Poin</p>
+              <p className="text-[#1E498E]/70 text-xs sm:text-sm">Total Poin</p>
             </div>
 
             {/* Streak Card */}
-            <div className="bg-white/20 backdrop-blur-xl rounded-3xl border border-white/30 shadow-2xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-red-400 to-pink-500 rounded-full flex items-center justify-center">
-                  <Flame className="w-6 h-6 text-white" />
+            <div className="bg-white/20 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-white/30 shadow-2xl p-3 sm:p-6">
+              <div className="flex items-center justify-between mb-2 sm:mb-4">
+                <div className="w-8 h-8 sm:w-12 sm:h-12 bg-gradient-to-br from-red-400 to-pink-500 rounded-full flex items-center justify-center">
+                  <Flame className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                 </div>
-                <span className="text-2xl font-bold text-[#1E498E]">{userStats.streak}</span>
+                <span className="text-lg sm:text-2xl font-bold text-[#1E498E]">{userStats.streak}</span>
               </div>
-              <p className="text-[#1E498E]/70 text-sm">Hari Streak</p>
+              <p className="text-[#1E498E]/70 text-xs sm:text-sm">Hari Streak</p>
             </div>
 
             {/* Goals Card */}
-            <div className="bg-white/20 backdrop-blur-xl rounded-3xl border border-white/30 shadow-2xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-6 h-6 text-white" />
+            <div className="bg-white/20 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-white/30 shadow-2xl p-3 sm:p-6">
+              <div className="flex items-center justify-between mb-2 sm:mb-4">
+                <div className="w-8 h-8 sm:w-12 sm:h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center">
+                  <CheckCircle className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                 </div>
-                <span className="text-2xl font-bold text-[#1E498E]">{userStats.completedGoals}</span>
+                <span className="text-lg sm:text-2xl font-bold text-[#1E498E]">{userStats.completedGoals}</span>
               </div>
-              <p className="text-[#1E498E]/70 text-sm">Goals Selesai</p>
+              <p className="text-[#1E498E]/70 text-xs sm:text-sm">Goals Selesai</p>
             </div>
           </motion.div>
 
           {/* Navigation Tabs */}
-          <motion.div className="flex justify-center mb-8" variants={itemVariants}>
-            <div className="bg-white/20 backdrop-blur-xl rounded-2xl p-2 border border-white/30">
-              <div className="flex gap-2">
+          <motion.div className="flex justify-center mb-6 sm:mb-8 px-4" variants={itemVariants}>
+            <div className="bg-white/20 backdrop-blur-xl rounded-xl sm:rounded-2xl p-1 sm:p-2 border border-white/30 w-full sm:w-auto">
+              <div className="flex gap-1 sm:gap-2">
                 {[
-                  { id: 'goals', label: 'Goals', icon: <Target className="w-4 h-4" /> },
-                  { id: 'achievements', label: 'Achievements', icon: <Trophy className="w-4 h-4" /> },
-                  { id: 'stats', label: 'Statistik', icon: <BarChart3 className="w-4 h-4" /> }
+                  { id: 'goals', label: 'Goals', shortLabel: 'Goals', icon: <Target className="w-3 h-3 sm:w-4 sm:h-4" /> },
+                  { id: 'achievements', label: 'Achievements', shortLabel: 'Badges', icon: <Trophy className="w-3 h-3 sm:w-4 sm:h-4" /> },
+                  { id: 'stats', label: 'Statistik', shortLabel: 'Stats', icon: <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4" /> }
                 ].map((tab) => (
                   <motion.button
                     key={tab.id}
                     onClick={() => setViewMode(tab.id as 'goals' | 'achievements' | 'stats')}
-                    className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${
+                    className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-medium transition-all flex-1 sm:flex-initial justify-center ${
                       viewMode === tab.id
                         ? 'bg-[#1E498E] text-white shadow-lg'
                         : 'text-[#1E498E] hover:bg-white/30'
@@ -417,7 +417,10 @@ export default function TargetPage() {
                     whileTap={{ scale: 0.95 }}
                   >
                     {tab.icon}
-                    {tab.label}
+                    <span className="text-xs sm:text-sm">
+                      <span className="sm:hidden">{tab.shortLabel}</span>
+                      <span className="hidden sm:inline">{tab.label}</span>
+                    </span>
                   </motion.button>
                 ))}
               </div>
@@ -435,23 +438,23 @@ export default function TargetPage() {
                 className="space-y-6"
               >
                 {/* Goals List */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                   {goals.map((goal, index) => (
                     <motion.div
                       key={goal.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.1 }}
-                      className="bg-white/20 backdrop-blur-xl rounded-3xl border border-white/30 shadow-2xl p-6 hover:shadow-3xl transition-all"
+                      className="bg-white/20 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-white/30 shadow-2xl p-4 sm:p-6 hover:shadow-3xl transition-all"
                     >
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 ${CATEGORIES[goal.category].color} rounded-full flex items-center justify-center text-white`}>
+                      <div className="flex items-start justify-between mb-3 sm:mb-4">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <div className={`w-8 h-8 sm:w-10 sm:h-10 ${CATEGORIES[goal.category].color} rounded-full flex items-center justify-center text-white`}>
                             {CATEGORIES[goal.category].icon}
                           </div>
                           <div>
-                            <h3 className="text-xl font-bold text-[#1E498E]">{goal.title}</h3>
-                            <p className="text-[#1E498E]/70 text-sm">{CATEGORIES[goal.category].name}</p>
+                            <h3 className="text-lg sm:text-xl font-bold text-[#1E498E]">{goal.title}</h3>
+                            <p className="text-[#1E498E]/70 text-xs sm:text-sm">{CATEGORIES[goal.category].name}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
@@ -460,7 +463,7 @@ export default function TargetPage() {
                         </div>
                       </div>
 
-                      <p className="text-[#1E498E]/80 mb-4 text-sm">{goal.description}</p>
+                      <p className="text-[#1E498E]/80 mb-3 sm:mb-4 text-xs sm:text-sm">{goal.description}</p>
 
                       {/* Progress Bar */}
                       <div className="mb-4">
@@ -483,11 +486,11 @@ export default function TargetPage() {
                       </div>
 
                       {/* Actions */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
+                      <div className="flex items-center justify-between flex-wrap gap-2">
+                        <div className="flex items-center gap-1 sm:gap-2">
                           <motion.button
                             onClick={() => handleUpdateGoalProgress(goal.id, Math.min(goal.currentValue + 1, goal.targetValue))}
-                            className="bg-green-500 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-green-600 transition-colors"
+                            className="bg-green-500 text-white px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium hover:bg-green-600 transition-colors"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                           >
@@ -495,19 +498,19 @@ export default function TargetPage() {
                           </motion.button>
                           <motion.button
                             onClick={() => {/* TODO: Implement edit goal functionality */}}
-                            className="bg-blue-500 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-blue-600 transition-colors"
+                            className="bg-blue-500 text-white px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium hover:bg-blue-600 transition-colors"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                           >
-                            <Edit3 className="w-4 h-4" />
+                            <Edit3 className="w-3 h-3 sm:w-4 sm:h-4" />
                           </motion.button>
                           <motion.button
                             onClick={() => handleDeleteGoal(goal.id)}
-                            className="bg-red-500 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-red-600 transition-colors"
+                            className="bg-red-500 text-white px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium hover:bg-red-600 transition-colors"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                           </motion.button>
                         </div>
                         <div className={`px-3 py-1 rounded-full text-xs font-medium ${
@@ -533,26 +536,26 @@ export default function TargetPage() {
                 exit={{ opacity: 0, y: -20 }}
                 className="space-y-6"
               >
-                <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-[#1E498E] mb-4">Achievements & Badges</h2>
-                  <p className="text-[#1E498E]/70">Koleksi pencapaian dan badge yang telah Anda raih</p>
+                <div className="text-center mb-6 sm:mb-8">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-[#1E498E] mb-2 sm:mb-4">Achievements & Badges</h2>
+                  <p className="text-[#1E498E]/70 text-sm sm:text-base px-4 sm:px-0">Koleksi pencapaian dan badge yang telah Anda raih</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   {userStats.achievements.map((achievement, index) => (
                     <motion.div
                       key={achievement.id}
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: index * 0.1 }}
-                      className="bg-white/20 backdrop-blur-xl rounded-3xl border border-white/30 shadow-2xl p-6 hover:shadow-3xl transition-all"
+                      className="bg-white/20 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-white/30 shadow-2xl p-4 sm:p-6 hover:shadow-3xl transition-all"
                     >
                       <div className="text-center">
-                        <div className={`w-16 h-16 ${RARITY_COLORS[achievement.rarity]} rounded-full flex items-center justify-center mx-auto mb-4`}>
+                        <div className={`w-12 h-12 sm:w-16 sm:h-16 ${RARITY_COLORS[achievement.rarity]} rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4`}>
                           {achievement.icon}
                         </div>
-                        <h3 className="text-xl font-bold text-[#1E498E] mb-2">{achievement.title}</h3>
-                        <p className="text-[#1E498E]/70 text-sm mb-4">{achievement.description}</p>
+                        <h3 className="text-lg sm:text-xl font-bold text-[#1E498E] mb-1 sm:mb-2">{achievement.title}</h3>
+                        <p className="text-[#1E498E]/70 text-xs sm:text-sm mb-3 sm:mb-4">{achievement.description}</p>
                         <div className="flex items-center justify-center gap-2">
                           <Star className="w-4 h-4 text-yellow-400" />
                           <span className="text-sm font-medium text-[#1E498E]">{achievement.points} poin</span>
@@ -580,37 +583,37 @@ export default function TargetPage() {
                 exit={{ opacity: 0, y: -20 }}
                 className="space-y-6"
               >
-                <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-[#1E498E] mb-4">Statistik & Progress</h2>
-                  <p className="text-[#1E498E]/70">Lihat perkembangan dan pencapaian Anda</p>
+                <div className="text-center mb-6 sm:mb-8">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-[#1E498E] mb-2 sm:mb-4">Statistik & Progress</h2>
+                  <p className="text-[#1E498E]/70 text-sm sm:text-base px-4 sm:px-0">Lihat perkembangan dan pencapaian Anda</p>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                   {/* Weekly Progress Chart */}
-                  <div className="bg-white/20 backdrop-blur-xl rounded-3xl border border-white/30 shadow-2xl p-6">
-                    <h3 className="text-xl font-bold text-[#1E498E] mb-4">Progress Mingguan</h3>
-                    <div className="space-y-4">
+                  <div className="bg-white/20 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-white/30 shadow-2xl p-4 sm:p-6">
+                    <h3 className="text-lg sm:text-xl font-bold text-[#1E498E] mb-3 sm:mb-4">Progress Mingguan</h3>
+                    <div className="space-y-3 sm:space-y-4">
                       {userStats.weeklyProgress.map((value, index) => (
-                        <div key={index} className="flex items-center gap-4">
-                          <span className="text-sm text-[#1E498E]/70 w-12">Hari {index + 1}</span>
-                          <div className="flex-1 bg-gray-200 rounded-full h-3">
+                        <div key={index} className="flex items-center gap-2 sm:gap-4">
+                          <span className="text-xs sm:text-sm text-[#1E498E]/70 w-10 sm:w-12">Hari {index + 1}</span>
+                          <div className="flex-1 bg-gray-200 rounded-full h-2 sm:h-3">
                             <motion.div
-                              className="bg-gradient-to-r from-[#1E498E] to-[#3B82F6] h-3 rounded-full"
+                              className="bg-gradient-to-r from-[#1E498E] to-[#3B82F6] h-2 sm:h-3 rounded-full"
                               initial={{ width: 0 }}
                               animate={{ width: `${value}%` }}
                               transition={{ duration: 1, delay: index * 0.1 }}
                             />
                           </div>
-                          <span className="text-sm font-medium text-[#1E498E] w-12">{value}%</span>
+                          <span className="text-xs sm:text-sm font-medium text-[#1E498E] w-8 sm:w-12">{value}%</span>
                         </div>
                       ))}
                     </div>
                   </div>
 
                   {/* Monthly Progress Chart */}
-                  <div className="bg-white/20 backdrop-blur-xl rounded-3xl border border-white/30 shadow-2xl p-6">
-                    <h3 className="text-xl font-bold text-[#1E498E] mb-4">Progress Bulanan</h3>
-                    <div className="h-64 flex items-end gap-2">
+                  <div className="bg-white/20 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-white/30 shadow-2xl p-4 sm:p-6">
+                    <h3 className="text-lg sm:text-xl font-bold text-[#1E498E] mb-3 sm:mb-4">Progress Bulanan</h3>
+                    <div className="h-48 sm:h-64 flex items-end gap-1 sm:gap-2">
                       {userStats.monthlyProgress.map((value, index) => (
                         <motion.div
                           key={index}

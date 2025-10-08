@@ -136,6 +136,10 @@ export const loginWithEmail = async (email: string, password: string): Promise<L
 // Google Login
 export const loginWithGoogle = async (): Promise<LoginResult> => {
   try {
+    console.log('🔄 Starting Google login...');
+    console.log('Auth domain:', process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN);
+    console.log('Current domain:', window.location.hostname);
+    
     const result: UserCredential = await signInWithPopup(auth, googleProvider);
     
     // Update or create user data in Firestore (non-blocking)
@@ -182,13 +186,16 @@ export const loginWithGoogle = async (): Promise<LoginResult> => {
           errorMessage = 'Login dibatalkan';
           break;
         case 'auth/popup-blocked':
-          errorMessage = 'Popup diblokir oleh browser';
+          errorMessage = 'Popup diblokir oleh browser. Pastikan popup tidak diblokir dan domain sudah dikonfigurasi di Firebase';
           break;
         case 'auth/cancelled-popup-request':
           errorMessage = 'Login dibatalkan';
           break;
         case 'auth/network-request-failed':
           errorMessage = 'Koneksi internet bermasalah';
+          break;
+        case 'auth/unauthorized-domain':
+          errorMessage = 'Domain tidak diotorisasi. Tambahkan domain ini ke Firebase Console → Authentication → Settings → Authorized domains';
           break;
         default:
           errorMessage = error instanceof Error ? error.message : errorMessage;

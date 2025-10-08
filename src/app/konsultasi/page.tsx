@@ -596,7 +596,7 @@ export default function Konsultasi() {
           </motion.div>
 
           {/* Main Content - Enhanced Layout */}
-          <div className="grid lg:grid-cols-5 gap-8">
+          <div className="grid lg:grid-cols-5 gap-8 pb-15">
 
             {/* Left Column - Doctor Selection */}
             <motion.div className="lg:col-span-3 space-y-8" variants={itemVariants}>

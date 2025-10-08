@@ -222,22 +222,22 @@ export default function DoctorDashboard() {
     <div className="min-h-screen bg-white">
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-6 py-8 pt-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pt-20 sm:pt-24 pb-24 sm:pb-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
+          className="mb-8 sm:mb-12"
         >
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 bg-[#1E498E] rounded-full flex items-center justify-center">
-              <Stethoscope className="w-6 h-6 text-white" />
+          <div className="flex items-center gap-3 sm:gap-4 mb-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#1E498E] rounded-full flex items-center justify-center">
+              <Stethoscope className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
                 Dashboard Dokter
               </h1>
-              <p className="text-gray-600">
+              <p className="text-sm sm:text-base text-gray-600">
                 Selamat datang, <span className="font-semibold text-[#1E498E]">{doctorData?.name}</span>
               </p>
             </div>
@@ -245,18 +245,18 @@ export default function DoctorDashboard() {
         </motion.div>
 
         {/* Stats Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
             className="text-center"
           >
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-[#1E498E]/10 rounded-full mb-4">
-              <Calendar className="w-8 h-8 text-[#1E498E]" />
+            <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-[#1E498E]/10 rounded-full mb-3 sm:mb-4">
+              <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-[#1E498E]" />
             </div>
-            <div className="text-3xl font-bold text-gray-900 mb-1">{stats.total}</div>
-            <div className="text-sm text-gray-600">Total Janji Temu</div>
+            <div className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{stats.total}</div>
+            <div className="text-xs sm:text-sm text-gray-600">Total Janji Temu</div>
           </motion.div>
 
           <motion.div
@@ -265,11 +265,11 @@ export default function DoctorDashboard() {
             transition={{ delay: 0.2 }}
             className="text-center"
           >
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-              <CheckCircle className="w-8 h-8 text-green-700" />
+            <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-green-100 rounded-full mb-3 sm:mb-4">
+              <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8 text-green-700" />
             </div>
-            <div className="text-3xl font-bold text-gray-900 mb-1">{stats.confirmed}</div>
-            <div className="text-sm text-gray-600">Dikonfirmasi</div>
+            <div className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{stats.confirmed}</div>
+            <div className="text-xs sm:text-sm text-gray-600">Dikonfirmasi</div>
           </motion.div>
 
           <motion.div
@@ -278,11 +278,11 @@ export default function DoctorDashboard() {
             transition={{ delay: 0.3 }}
             className="text-center"
           >
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-100 rounded-full mb-4">
-              <Clock className="w-8 h-8 text-yellow-600" />
+            <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-yellow-100 rounded-full mb-3 sm:mb-4">
+              <Clock className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-600" />
             </div>
-            <div className="text-3xl font-bold text-gray-900 mb-1">{stats.pending}</div>
-            <div className="text-sm text-gray-600">Menunggu</div>
+            <div className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{stats.pending}</div>
+            <div className="text-xs sm:text-sm text-gray-600">Menunggu</div>
           </motion.div>
 
           <motion.div
@@ -291,11 +291,11 @@ export default function DoctorDashboard() {
             transition={{ delay: 0.4 }}
             className="text-center"
           >
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
-              <XCircle className="w-8 h-8 text-red-600" />
+            <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-red-100 rounded-full mb-3 sm:mb-4">
+              <XCircle className="w-6 h-6 sm:w-8 sm:h-8 text-red-600" />
             </div>
-            <div className="text-3xl font-bold text-gray-900 mb-1">{stats.cancelled}</div>
-            <div className="text-sm text-gray-600">Dibatalkan</div>
+            <div className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{stats.cancelled}</div>
+            <div className="text-xs sm:text-sm text-gray-600">Dibatalkan</div>
           </motion.div>
         </div>
 
@@ -305,11 +305,11 @@ export default function DoctorDashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-              <div className="flex items-center gap-3 mb-6">
-                <Users className="w-6 h-6 text-[#1E498E]" />
+              <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-[#1E498E]" />
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900">Daftar Janji Temu</h2>
-                  <p className="text-sm text-gray-600">Semua jadwal konsultasi pasien Anda</p>
+                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Daftar Janji Temu</h2>
+                  <p className="text-xs sm:text-sm text-gray-600">Semua jadwal konsultasi pasien Anda</p>
                 </div>
               </div>
 
@@ -321,13 +321,13 @@ export default function DoctorDashboard() {
                   </div>
                 </div>
               ) : appointments.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <Calendar className="w-16 h-16 text-gray-400 mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Belum Ada Janji Temu</h3>
-                  <p className="text-gray-600">Anda belum memiliki jadwal konsultasi</p>
+                <div className="flex flex-col items-center justify-center py-8 sm:py-12 text-center">
+                  <Calendar className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mb-3 sm:mb-4" />
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Belum Ada Janji Temu</h3>
+                  <p className="text-sm sm:text-base text-gray-600 px-4">Anda belum memiliki jadwal konsultasi</p>
                 </div>
               ) : (
-                <div className="space-y-6">
+                <div className="space-y-4 sm:space-y-6">
                 {appointments.map((appointment, index) => {
                   const statusConfig = getStatusConfig(appointment.status)
                   return (
@@ -336,36 +336,36 @@ export default function DoctorDashboard() {
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.05 }}
-                      className="border-b border-gray-200 pb-6 hover:bg-gray-50 transition-colors"
+                      className="border-b border-gray-200 pb-4 sm:pb-6 hover:bg-gray-50 transition-colors px-2 sm:px-0"
                     >
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 bg-[#1E498E] rounded-full flex items-center justify-center text-white font-bold">
+                      <div className="flex items-start justify-between mb-3 sm:mb-4 flex-col sm:flex-row gap-3 sm:gap-0">
+                        <div className="flex items-center gap-2 sm:gap-3 flex-1">
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#1E498E] rounded-full flex items-center justify-center text-white font-bold text-sm sm:text-base">
                             {appointment.userName.charAt(0).toUpperCase()}
                           </div>
-                          <div>
-                            <h3 className="font-bold text-[#1E498E] text-lg">{appointment.userName}</h3>
-                            <p className="text-sm text-[#1E498E]/70">{appointment.userEmail}</p>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-bold text-[#1E498E] text-base sm:text-lg truncate">{appointment.userName}</h3>
+                            <p className="text-xs sm:text-sm text-[#1E498E]/70 truncate">{appointment.userEmail}</p>
                             <p className="text-xs text-[#1E498E]/50 mt-1">Order: {appointment.orderId}</p>
                           </div>
                         </div>
-                        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${statusConfig.color} font-semibold text-sm`}>
+                        <div className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full ${statusConfig.color} font-semibold text-xs sm:text-sm whitespace-nowrap`}>
                           {statusConfig.icon}
                           {statusConfig.label}
                         </div>
                       </div>
 
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <div className="flex items-center gap-3 text-[#1E498E]">
-                          <Calendar className="w-5 h-5" />
-                          <span className="font-medium">{formatDate(appointment.selectedDate)}</span>
+                      <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                        <div className="flex items-center gap-2 sm:gap-3 text-[#1E498E]">
+                          <Calendar className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                          <span className="font-medium text-sm sm:text-base">{formatDate(appointment.selectedDate)}</span>
                         </div>
 
-                        <div className="flex items-start gap-3 text-[#1E498E]">
-                          <Clock className="w-5 h-5 mt-0.5" />
-                          <div className="flex flex-wrap gap-2">
+                        <div className="flex items-start gap-2 sm:gap-3 text-[#1E498E]">
+                          <Clock className="w-4 h-4 sm:w-5 sm:h-5 mt-0.5 flex-shrink-0" />
+                          <div className="flex flex-wrap gap-1 sm:gap-2">
                             {appointment.selectedTimes.map((time, idx) => (
-                              <span key={idx} className="bg-white px-3 py-1 rounded-full text-sm font-medium">
+                              <span key={idx} className="bg-white px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium">
                                 {time}
                               </span>
                             ))}
@@ -373,9 +373,9 @@ export default function DoctorDashboard() {
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between pt-4 mt-4 border-t border-[#1E498E]/10">
-                        <span className="text-[#1E498E]/70 text-sm">Pembayaran</span>
-                        <span className="text-[#1E498E] font-bold text-lg">
+                      <div className="flex items-center justify-between pt-3 sm:pt-4 mt-3 sm:mt-4 border-t border-[#1E498E]/10">
+                        <span className="text-[#1E498E]/70 text-xs sm:text-sm">Pembayaran</span>
+                        <span className="text-[#1E498E] font-bold text-base sm:text-lg">
                           Rp {appointment.amount.toLocaleString('id-ID')}
                         </span>
                       </div>
@@ -386,7 +386,7 @@ export default function DoctorDashboard() {
                           onClick={() => router.push(`/page/konsulroom?appointmentId=${appointment.orderId}`)}
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
-                          className="w-full mt-4 bg-gradient-to-r from-[#1E498E] to-[#3B82F6] text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transition-shadow"
+                          className="w-full mt-3 sm:mt-4 bg-gradient-to-r from-[#1E498E] to-[#3B82F6] text-white py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg sm:rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transition-shadow text-sm sm:text-base"
                         >
                           <MessageCircle className="w-5 h-5" />
                           Masuk Ruang Konsultasi

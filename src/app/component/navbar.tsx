@@ -76,6 +76,7 @@ export default function Navbar() {
 
   const navItems = [
     { href: '/', label: 'Beranda' },
+    { href: '/page/SehatJiwa', label: 'Sehat Jiwa' },
   ];
 
   const siTenangItems = [
@@ -132,7 +133,7 @@ export default function Navbar() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    onClick={(e) => {
+                    onClick={() => {
                       setShowSiTenangMenu(false);
                     }}
                     className={`block px-4 py-3 text-sm transition-colors cursor-pointer ${
@@ -275,12 +276,18 @@ export default function Navbar() {
 
       {/* Bottom navigation for mobile */}
       <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-black/10 bg-white/80 backdrop-blur-md">
-        <div className="max-w-[1280px] mx-auto px-2 py-1 grid grid-cols-4 gap-1">
+        <div className="max-w-[1280px] mx-auto px-2 py-1 grid grid-cols-5 gap-1">
           <Link href="/" className={`flex flex-col items-center justify-center py-2 rounded-xl ${pathname === '/' ? 'text-[#1E498E] bg-[#1E498E]/10' : 'text-black/70'}`}>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
               <path d="M11.47 3.84a.75.75 0 011.06 0l8.25 8.25a.75.75 0 01-1.06 1.06l-.72-.72V20.5A2.5 2.5 0 0116.5 23h-9A2.5 2.5 0 015 20.5v-8.07l-.72.72a.75.75 0 01-1.06-1.06l8.25-8.25z"/>
             </svg>
             <span className="text-xs mt-0.5">Beranda</span>
+          </Link>
+          <Link href="/page/SehatJiwa" className={`flex flex-col items-center justify-center py-2 rounded-xl ${pathname === '/page/SehatJiwa' ? 'text-[#1E498E] bg-[#1E498E]/10' : 'text-black/70'}`}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span className="text-xs mt-0.5">Sehat Jiwa</span>
           </Link>
           <div className="relative">
             <button 

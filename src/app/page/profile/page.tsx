@@ -289,7 +289,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Profile Details */}
-                <div className="space-y-4">
+                <div className="space-y-4 pb-20">
                   <h3 className="text-lg font-semibold text-[#1E498E] mb-4">Detail Akun</h3>
                   
                   <div className="space-y-3">
