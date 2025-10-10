@@ -3,12 +3,14 @@
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { getCurrentUserAsync, isAuthenticatedAsync } from '../service/loginservice';
 import { User } from 'firebase/auth';
 import { db } from '../service/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { Brain, Mic, MessageCircle } from 'lucide-react';
+import MobileBottomBar from './Bottombar';
+import Bottombar from './Bottombar';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -18,6 +20,7 @@ export default function Navbar() {
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
   const [isDoctor, setIsDoctor] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const accountMenuRef = useRef<HTMLDivElement>(null);
   const siTenangMenuRef = useRef<HTMLDivElement>(null);
 
@@ -80,13 +83,13 @@ export default function Navbar() {
   ];
 
   const siTenangItems = [
-    { href: '/page/mental-assessment', label: 'Deteksi TenJin', icon: <Brain className="w-4 h-4 text-[#1E498E] z-50" /> },
-    { href: '/page/suaratenjin', label: 'Suara TenJin', icon: <Mic className="w-4 h-4 text-[#1E498E] z-50" /> },
-    { href: '/page/ceritatenjin', label: 'Cerita TenJin', icon: <MessageCircle className="w-4 h-4 text-[#1E498E] z-50" /> },
+    { href: '/page/mental-assessment', label: 'Deteksi TenJin', icon: <Brain className="w-4 h-4 text-[#1E498E]" /> },
+    { href: '/page/suaratenjin', label: 'Suara TenJin', icon: <Mic className="w-4 h-4 text-[#1E498E]" /> },
+    { href: '/page/ceritatenjin', label: 'Cerita TenJin', icon: <MessageCircle className="w-4 h-4 text-[#1E498E]" /> },
   ];
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? '' : 'bg-transparent'}`}>
+    <header className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${scrolled ? '' : 'bg-transparent'}`}>
       <nav className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3 group">
 
@@ -128,7 +131,7 @@ export default function Navbar() {
             </button>
             
             {showSiTenangMenu && (
-              <div className="absolute left-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-2xl py-2 z-[9999] pointer-events-auto">
+              <div className="absolute left-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-2xl py-2 z-[110] pointer-events-auto">
                 {siTenangItems.map((item) => (
                   <Link
                     key={item.href}
@@ -142,7 +145,7 @@ export default function Navbar() {
                         : 'text-black/70 hover:text-[#1E498E] hover:bg-[#1E498E]/10'
                     }`}
                   >
-                    <div className="flex items-center gap-2 pointer-events-none">
+                    <div className="flex items-center gap-2">
                       {item.icon}
                       <span>{item.label}</span>
                     </div>
@@ -186,7 +189,7 @@ export default function Navbar() {
             </button>
             
             {showAccountMenu && (
-              <div className="absolute right-0 mt-2 w-48 bg-white/90 backdrop-blur-md rounded-xl border border-black/10 shadow-lg py-2 z-50">
+              <div className="absolute right-0 mt-2 w-48 bg-white/90 backdrop-blur-md rounded-xl border border-black/10 shadow-lg py-2 z-[110]">
                 {isUserAuthenticated && user ? (
                   <>
                     <div className="px-4 py-2 border-b border-gray-200">
@@ -273,85 +276,7 @@ export default function Navbar() {
           </Link>
         </div>
       </nav>
-
-      {/* Bottom navigation for mobile */}
-      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-black/10 bg-white/80 backdrop-blur-md">
-        <div className="max-w-[1280px] mx-auto px-2 py-1 grid grid-cols-5 gap-1">
-          <Link href="/" className={`flex flex-col items-center justify-center py-2 rounded-xl ${pathname === '/' ? 'text-[#1E498E] bg-[#1E498E]/10' : 'text-black/70'}`}>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-              <path d="M11.47 3.84a.75.75 0 011.06 0l8.25 8.25a.75.75 0 01-1.06 1.06l-.72-.72V20.5A2.5 2.5 0 0116.5 23h-9A2.5 2.5 0 015 20.5v-8.07l-.72.72a.75.75 0 01-1.06-1.06l8.25-8.25z"/>
-            </svg>
-            <span className="text-xs mt-0.5">Beranda</span>
-          </Link>
-          <Link href="/page/SehatJiwa" className={`flex flex-col items-center justify-center py-2 rounded-xl ${pathname === '/page/SehatJiwa' ? 'text-[#1E498E] bg-[#1E498E]/10' : 'text-black/70'}`}>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <span className="text-xs mt-0.5">Sehat Jiwa</span>
-          </Link>
-          <div className="relative">
-            <button 
-              onClick={() => setShowSiTenangMenu(!showSiTenangMenu)}
-              className={`flex flex-col items-center justify-center py-2 rounded-xl w-full ${siTenangItems.some(item => pathname === item.href) ? 'text-[#1E498E] bg-[#1E498E]/10' : 'text-black/70'}`}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-                <path d="M4.5 6.75A2.25 2.25 0 016.75 4.5h10.5A2.25 2.25 0 0119.5 6.75v10.5A2.25 2.25 0 0117.25 19.5H6.75A2.25 2.25 0 014.5 17.25V6.75zm3 1.5a.75.75 0 000 1.5h9a.75.75 0 000-1.5h-9zm0 3a.75.75 0 000 1.5h9a.75.75 0 000-1.5h-9zm0 3a.75.75 0 000 1.5h5.25a.75.75 0 000-1.5H7.5z" />
-              </svg>
-              <span className="text-xs mt-0.5">SiTenang</span>
-            </button>
-            
-            {showSiTenangMenu && (
-              <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-56 bg-white backdrop-blur-md rounded-xl border border-black/10 shadow-2xl py-2 z-[999]">
-                {siTenangItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setShowSiTenangMenu(false)}
-                    className={`block px-4 py-3 text-sm transition-colors z-[9999] ${
-                      pathname === item.href
-                        ? 'text-[#1E498E] bg-[#1E498E]/10 font-medium'
-                        : 'text-black/70 hover:bg-[#1E498E]/5'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      {item.icon}
-                      <span>{item.label}</span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-          <Link href="/konsultasi" className={`flex flex-col items-center justify-center py-2 rounded-xl ${pathname === '/konsultasi' ? 'text-[#1E498E] bg-[#1E498E]/10' : 'text-black/70'}`}>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-              <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm6.967-2.28a.75.75 0 10-1.06 1.06L11.31 14l4.97-4.97a.75.75 0 00-1.06-1.06L11.31 11.88 9.217 9.72z" clipRule="evenodd" />
-            </svg>
-            <span className="text-xs mt-0.5">Konsultasi</span>
-          </Link>
-          <Link href={isUserAuthenticated ? "/page/profile" : "/page/login"} className={`flex flex-col items-center justify-center py-2 rounded-xl ${pathname === '/page/profile' || pathname === '/page/login' ? 'text-[#1E498E] bg-[#1E498E]/10' : 'text-black/70'}`}>
-            {isUserAuthenticated && user ? (
-              user.photoURL ? (
-                <Image
-                  src={user.photoURL}
-                  alt="Profile"
-                  width={24}
-                  height={24}
-                  className="w-6 h-6 rounded-full object-cover"
-                />
-              ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-              )
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-                <path fillRule="evenodd" d="M3.75 4.5A2.25 2.25 0 016 2.25h6A2.25 2.25 0 0114.25 4.5v15a.75.75 0 01-1.5 0V4.5A.75.75 0 0012 3.75H6A.75.75 0 005.25 4.5v15a.75.75 0 01-1.5 0v-15zm9.72 8.28a.75.75 0 010 1.06l-3 3a.75.75 0 11-1.06-1.06L11.44 13.5H21a.75.75 0 000-1.5h-9.56l1.97-1.97a.75.75 0 011.06 0z" clipRule="evenodd" />
-              </svg>
-            )}
-            <span className="text-xs mt-0.5">{isUserAuthenticated ? 'Profil' : 'Masuk'}</span>
-          </Link>
-        </div>
-      </div>
+            <Bottombar />
     </header>
   );
 }
