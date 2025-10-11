@@ -8,7 +8,7 @@ import { getCurrentUserAsync, isAuthenticatedAsync } from '../service/loginservi
 import { User } from 'firebase/auth';
 import { db } from '../service/firebase';
 import { doc, getDoc } from 'firebase/firestore';
-import { Brain, Mic, MessageCircle } from 'lucide-react';
+import { Brain, Mic, MessageCircle, User as UserIcon } from 'lucide-react';
 import MobileBottomBar from './Bottombar';
 import Bottombar from './Bottombar';
 
@@ -114,7 +114,6 @@ export default function Navbar() {
             );
           })}
           
-          {/* SiTenang Dropdown */}
           <div className="relative" ref={siTenangMenuRef}>
             <button
               onClick={() => setShowSiTenangMenu(!showSiTenangMenu)}
@@ -155,38 +154,44 @@ export default function Navbar() {
             )}
           </div>
           
-          {/* Account Dropdown */}
+          {/* Account Dropdown - Updated with Profile Icon and Name */}
           <div className="relative" ref={accountMenuRef}>
-            <button
-              onClick={() => setShowAccountMenu(!showAccountMenu)}
-              className="text-sm px-3 py-2 rounded-full transition-all duration-200 text-black/70 hover:text-[#1E498E] hover:bg-black/5 flex items-center gap-1"
-            >
-              {isUserAuthenticated && user ? (
-                <div className="flex items-center gap-2">
-                  {user.photoURL ? (
-                    <Image
-                      src={user.photoURL}
-                      alt="Profile"
-                      width={24}
-                      height={24}
-                      className="w-6 h-6 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-6 h-6 bg-[#1E498E]/20 rounded-full flex items-center justify-center">
-                      <svg className="w-4 h-4 text-[#1E498E]" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                      </svg>
-                    </div>
-                  )}
-                  <span className="hidden md:block">{user.displayName || 'Profil'}</span>
-                </div>
-              ) : (
-                'Akun'
-              )}
-              <svg className={`w-4 h-4 transition-transform duration-200 ${showAccountMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
+            {isUserAuthenticated && user ? (
+              <button
+                onClick={() => setShowAccountMenu(!showAccountMenu)}
+                className="text-sm px-3 py-2 rounded-full transition-all duration-200 text-black/70 hover:text-[#1E498E] hover:bg-black/5 flex items-center gap-2"
+              >
+                {user.photoURL ? (
+                  <Image
+                    src={user.photoURL}
+                    alt="Profile"
+                    width={32}
+                    height={32}
+                    className="w-8 h-8 rounded-full object-cover border-2 border-[#1E498E]/20"
+                  />
+                ) : (
+                  <div className="w-8 h-8 bg-[#1E498E]/20 rounded-full flex items-center justify-center border-2 border-[#1E498E]/30">
+                    <UserIcon className="w-5 h-5 text-[#1E498E]" />
+                  </div>
+                )}
+                <span className="hidden md:block font-medium text-[#1E498E]">
+                  {user.displayName || 'Pengguna'}
+                </span>
+                <svg className={`w-4 h-4 transition-transform duration-200 ${showAccountMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            ) : (
+              <button
+                onClick={() => setShowAccountMenu(!showAccountMenu)}
+                className="text-sm px-3 py-2 rounded-full transition-all duration-200 text-black/70 hover:text-[#1E498E] hover:bg-black/5 flex items-center gap-1"
+              >
+                Akun
+                <svg className={`w-4 h-4 transition-transform duration-200 ${showAccountMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            )}
             
             {showAccountMenu && (
               <div className="absolute right-0 mt-2 w-48 bg-white/90 backdrop-blur-md rounded-xl border border-black/10 shadow-lg py-2 z-[110]">
@@ -271,14 +276,16 @@ export default function Navbar() {
             )}
           </div>
           
+          {/* Updated Button Text - Changed from "Konsultasi" to "Konsultasi Psikiater" */}
           <Link href="/konsultasi" className="ml-2 text-sm text-white bg-[#1E498E] px-4 py-2 rounded-full hover:shadow-[0_8px_24px_rgba(30,73,142,0.35)] transition-shadow">
-            Konsultasi
+            Konsultasi Psikiater
           </Link>
         </div>
       </nav>
-            <Bottombar />
+      <Bottombar 
+        isAuthenticated={isUserAuthenticated} 
+        userPhotoURL={user?.photoURL || null} 
+      />
     </header>
   );
 }
-
-

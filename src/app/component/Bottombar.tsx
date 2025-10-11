@@ -147,7 +147,7 @@ export function MobileBottomBar({ isAuthenticated = false, userPhotoURL = null }
           )}
         </div>
 
-        {/* Konsultasi */}
+        {/* Konsultasi Psikiater */}
         <Link
           href="/konsultasi"
           aria-current={isActive("/konsultasi") ? "page" : undefined}
@@ -159,7 +159,7 @@ export function MobileBottomBar({ isAuthenticated = false, userPhotoURL = null }
             <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
             <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z" />
           </svg>
-          <span className="text-[10px] font-medium">Chat</span>
+          <span className="text-[10px] font-medium leading-tight">Konsul</span>
         </Link>
 
         {/* Profile / Login */}
@@ -172,21 +172,35 @@ export function MobileBottomBar({ isAuthenticated = false, userPhotoURL = null }
               : "text-gray-600 hover:bg-gray-50"
           }`}
         >
-          {isAuthenticated && userPhotoURL ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={userPhotoURL || "/placeholder.svg"}
-              alt="Profile"
-              width={24}
-              height={24}
-              className="w-6 h-6 rounded-full mb-1 object-cover"
-            />
+          {isAuthenticated ? (
+            // Tampilan ketika sudah login
+            <>
+              {userPhotoURL ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={userPhotoURL}
+                  alt="Profile"
+                  width={24}
+                  height={24}
+                  className="w-6 h-6 rounded-full mb-1 object-cover"
+                />
+              ) : (
+                // Icon profile default jika tidak ada foto
+                <svg className="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                  <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                </svg>
+              )}
+              <span className="text-[10px] font-medium">Profil</span>
+            </>
           ) : (
-            <svg className="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-            </svg>
+            // Tampilan ketika belum login
+            <>
+              <svg className="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path fillRule="evenodd" d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+              <span className="text-[10px] font-medium">Login</span>
+            </>
           )}
-          <span className="text-[10px] font-medium">{isAuthenticated ? "Profil" : "Login"}</span>
         </Link>
       </div>
     </nav>
